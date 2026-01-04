@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "/Qunchmark_1/", // Aapke repo ka naam yahan hona chahiye
+  base: "/", // Aapke repo ka naam yahan hona chahiye
 })
