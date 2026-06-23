@@ -1,0 +1,74 @@
+:root {
+  /* Light theme: near-white surfaces, depth from shadow, one warm highlight */
+  --creme: #ffffff;
+  --sand: #f4f3f1;
+  --pink: #efece9;
+  --espresso: #1c1a18;
+
+  --bg: #ffffff;            /* page base — white */
+  --bg-tint: #f7f6f4;       /* faintest warm-grey band */
+  --bg-mist: #f3f1ee;       /* slightly deeper light band */
+  --surface: #ffffff;       /* card surface */
+  --ink: #1f1c19;           /* near-black text */
+  --ink-soft: #77716a;      /* muted grey text */
+  --accent: #221f1c;        /* near-black — primary actions */
+  --accent-deep: #0f0d0b;   /* deepest near-black */
+  --accent-rose: #b07a55;   /* the single warm highlight accent */
+  --accent-tint: #f1ece7;   /* faint warm wash for badges/icons */
+  --gold: #c08a4a;          /* warm highlight for numerals/stars */
+  --line: rgba(20, 16, 12, 0.09);
+  --footer-text: #2a2723;
+  --footer-muted: #8a847d;
+  --shadow-sm: 0 4px 18px rgba(20, 16, 12, 0.05);
+  --shadow-md: 0 24px 60px -30px rgba(20, 16, 12, 0.20);
+
+  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  font-family: var(--font-sans);
+  color-scheme: light;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Lenis momentum scrolling */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
