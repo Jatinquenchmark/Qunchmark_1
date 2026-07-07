@@ -21,6 +21,7 @@
   --footer-muted: #8a847d;
   --shadow-sm: 0 4px 18px rgba(20, 16, 12, 0.05);
   --shadow-md: 0 24px 60px -30px rgba(20, 16, 12, 0.20);
+  --grad: linear-gradient(135deg, #b07a55, #c08a4a);
 
   --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;

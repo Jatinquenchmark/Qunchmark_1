@@ -3,7 +3,13 @@ import * as THREE from "three";
 import Lenis from "lenis";
 import { getProject } from "@theatre/core";
 import "./App.css";
-import logoImg from "./assets/quenchmark.jpeg";
+import logoImg from "./assets/quenchmark-logo.png";
+import tripsoulLogo from "./assets/tripsoul-logo.png";
+import parameterxLogo from "./assets/parameterx-logo.png";
+import quantmentorLogo from "./assets/quantmentor-logo.png";
+import tripsoulShot from "./assets/tripsoul-shot.png";
+import parameterxShot from "./assets/parameterx-shot.png";
+import quantmentorShot from "./assets/quantmentor-shot.png";
 
 /* ---------- Theatre.js: cinematic hero entrance ---------- */
 const tkf = (position, value, connectedRight = true) => ({
@@ -110,6 +116,8 @@ const ventures = [
     icon: Icon.travel, tag: "Travel Tech", category: "Travel Tech", title: "TripSoul",
     desc: "Curated premium travel experiences — personalized planning, tailored itineraries, and local expert support.",
     link: "https://www.tripsoul.org",
+    logo: tripsoulLogo,
+    shot: tripsoulShot,
     image: `${IMG}1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=80`,
     accent: "rgba(176, 122, 60, 0.42)",
     facts: [
@@ -123,6 +131,9 @@ const ventures = [
     icon: Icon.shield, tag: "Cybersecurity", category: "Cybersecurity", title: "ParameterX",
     desc: "Advanced cybersecurity and technology solutions — threat detection, monitoring, and enterprise security infrastructure.",
     link: "https://www.parameterx.org",
+    logo: parameterxLogo,
+    logoDark: true,
+    shot: parameterxShot,
     image: `${IMG}1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80`,
     accent: "rgba(42, 84, 128, 0.46)",
     facts: [
@@ -136,6 +147,9 @@ const ventures = [
     icon: Icon.chart, tag: "AI Finance", category: "AI Finance", title: "QuantMentor",
     desc: "AI-powered finance — algorithmic trading support, market analytics, and custom strategy building.",
     link: "https://www.quantmentor.org",
+    logo: quantmentorLogo,
+    logoDark: true,
+    shot: quantmentorShot,
     image: `${IMG}1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1400&q=80`,
     accent: "rgba(40, 110, 82, 0.44)",
     facts: [
@@ -149,6 +163,7 @@ const ventures = [
     icon: Icon.spark, tag: "AI & Automation", category: "AI & Automation", title: "DMGennie",
     desc: "AI-powered Instagram automation — smart DM replies, lead capture, and engagement workflows for creators and businesses.",
     link: "https://www.dmgennie.org",
+    live: false,
     image: `${IMG}1620712943543-bcc4688e7485?auto=format&fit=crop&w=1400&q=80`,
     accent: "rgba(112, 58, 130, 0.44)",
     facts: [
@@ -246,24 +261,20 @@ function useScrollZoom() {
       raf = 0;
       const vh = window.innerHeight || 1;
       const dead = 0.2; // plateau where the centred section stays full-size
-      for (const el of els) {
+      // READ phase — measure every section first (one layout flush)
+      const vals = els.map((el) => {
         const r = el.getBoundingClientRect();
         const center = r.top + r.height / 2;
         const d = (center - vh / 2) / vh; // 0 = centred, + below, - above
         let t = (Math.abs(d) - dead) / (1 - dead);
         t = Math.max(0, Math.min(1, t));
-        let scale, opacity;
-        if (d >= 0) {
-          // entering from below — rises up from a slightly smaller state
-          scale = 1 - t * 0.1;
-          opacity = 1 - t * 0.5;
-        } else {
-          // exiting upward — swells past the viewer and dissolves
-          scale = 1 + t * 0.12;
-          opacity = 1 - t * 0.55;
-        }
-        el.style.setProperty("--zs", scale.toFixed(4));
-        el.style.setProperty("--zo", Math.max(0, opacity).toFixed(3));
+        // scale only (no opacity fade) — much lighter to composite while scrolling
+        if (d >= 0) return { s: 1 - t * 0.05 };
+        return { s: 1 + t * 0.06 };
+      });
+      // WRITE phase — apply all styles after reads, so no read/write thrash
+      for (let i = 0; i < els.length; i++) {
+        els[i].style.setProperty("--zs", vals[i].s.toFixed(4));
       }
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
@@ -516,7 +527,7 @@ function HeroThree() {
     camera.lookAt(0, 0, 0);
 
     // a cloud of soft motes scattered through a 3D volume
-    const COUNT = 1200;
+    const COUNT = 800;
     const positions = new Float32Array(COUNT * 3);
     const speeds = new Float32Array(COUNT);
     const phases = new Float32Array(COUNT);
@@ -596,7 +607,15 @@ function HeroThree() {
 
     const clock = new THREE.Clock();
     let raf = 0;
+    let visible = true;
+    const heroEl = document.getElementById("home");
+    const io = heroEl
+      ? new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 })
+      : null;
+    if (io && heroEl) io.observe(heroEl);
     function tick() {
+      raf = requestAnimationFrame(tick);
+      if (!visible) return; // pause GPU work while the hero is scrolled off-screen
       const t = clock.getElapsedTime();
       uniforms.uTime.value = reduce ? 0 : t;
       uniforms.uHover.value += (hoverTarget - uniforms.uHover.value) * 0.05;
@@ -609,7 +628,6 @@ function HeroThree() {
       camera.position.y += (camTarget.y - camera.position.y) * 0.04;
       camera.lookAt(0, 0, 0);
       renderer.render(scene, camera);
-      raf = requestAnimationFrame(tick);
     }
 
     resize();
@@ -622,6 +640,7 @@ function HeroThree() {
     return () => {
       cancelAnimationFrame(raf);
       cancelAnimationFrame(scrollRaf);
+      if (io) io.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseleave", onLeave);
@@ -815,6 +834,22 @@ function Scramble({ text, className = "", active = true }) {
 function Navbar({ nav, page }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState("creme");
+  const [scrolling, setScrolling] = useState(false);
+
+  // compact the navbar while actively scrolling; relax it when scrolling stops
+  useEffect(() => {
+    let timer;
+    const onScroll = () => {
+      setScrolling(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setScrolling(false), 550);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
   const sectionLinks = [["Home", "home"], ["About", "about"], ["Ventures", "ventures"], ["Services", "services"]];
   const close = () => setMenuOpen(false);
 
@@ -845,7 +880,7 @@ function Navbar({ nav, page }) {
 
   return (
     <header className="nav-wrap">
-      <nav className={`nav nav-theme-${theme}`}>
+      <nav className={`nav nav-theme-${theme} ${scrolling ? "is-scrolling" : ""}`}>
         <span className="brand" onClick={() => { nav.section("home"); close(); }}>
           <img src={logoImg} alt="Quenchmark" className="brand-logo" />
           <span className="brand-name">Quenchmark</span>
@@ -865,6 +900,14 @@ function Navbar({ nav, page }) {
           <span></span><span></span><span></span>
         </button>
       </nav>
+
+      <button
+        className={`nav-mini nav-theme-${theme} ${scrolling ? "is-on" : ""}`}
+        aria-label="Back to top"
+        onClick={() => nav.section("home")}
+      >
+        <img src={logoImg} alt="Quenchmark" className="nav-mini-logo" />
+      </button>
     </header>
   );
 }
@@ -883,6 +926,20 @@ function Footer({ nav }) {
           <div className="footer-contact">
             <a href="mailto:official@quenchmark.org">official@quenchmark.org</a>
             <span>Based in India 🇮🇳</span>
+          </div>
+          <div className="footer-social">
+            <a href="https://www.instagram.com/quench_mark?igsh=ZHRtZTZyZ3pzZmI5" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none" />
+              </svg>
+            </a>
+            <a href="https://www.linkedin.com/company/quench-mark/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM10 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.75V21h-4v-5.3c0-1.26-.02-2.9-1.77-2.9-1.77 0-2.04 1.38-2.04 2.8V21h-4z" />
+              </svg>
+            </a>
           </div>
         </div>
         <div className="footer-col">
@@ -947,15 +1004,16 @@ function HubStage({ onPick }) {
           <button
             key={n.vt.title}
             type="button"
-            className={`node ${n.i === active ? "is-active" : ""}`}
+            className={`node ${n.i === active ? "is-active" : ""} ${n.vt.logoDark ? "node-dark" : ""}`}
             style={{ left: `${(n.x / 360) * 100}%`, top: `${(n.y / 360) * 100}%`, "--fc": HUB[n.i].c, "--d": `${n.i * 0.6}s` }}
             onMouseEnter={() => setActive(n.i)}
             onFocus={() => setActive(n.i)}
             onClick={() => { setActive(n.i); onPick && onPick(n.i); }}
             aria-label={`${n.vt.title} — view in Ventures`}
           >
-            <span className="node-dot">{n.vt.icon}</span>
-            <span className="node-name">{n.vt.title}</span>
+            {n.vt.logo
+              ? <img className="node-logo" src={n.vt.logo} alt={n.vt.title} />
+              : <><span className="node-dot">{n.vt.icon}</span><span className="node-name">{n.vt.title}</span></>}
           </button>
         ))}
         <div className="hub-core">
@@ -1024,7 +1082,17 @@ function NumColumn({ kicker, title, items, variant }) {
 function Home({ nav, introDone }) {
   const [activeVent, setActiveVent] = useState(0);
   const [ventPaused, setVentPaused] = useState(false);
+  const [redirect, setRedirect] = useState(null);
+  const [frameLoaded, setFrameLoaded] = useState(false);
   useScrollZoom();
+  const startVisit = (v) => {
+    setFrameLoaded(false);
+    setRedirect(v); // opens an in-app frame (or "launching soon" if not live)
+  };
+  const closeVisit = () => {
+    setRedirect(null);
+    setFrameLoaded(false);
+  };
   useEffect(() => {
     if (ventPaused) return;
     const id = setInterval(() => setActiveVent((i) => (i + 1) % ventures.length), 5000);
@@ -1037,7 +1105,7 @@ function Home({ nav, introDone }) {
       <section className="hero" id="home" data-nav="creme">
         <div className="hero-inner">
           <div className="hero-main">
-            <span className="pill"><span className="pill-dot" />Quenchmark Venture Group</span>
+            <span className="pill">Quenchmark Venture Group</span>
             <h1>
               Powerful businesses, built <span className="hl">under one vision.</span>
             </h1>
@@ -1066,7 +1134,7 @@ function Home({ nav, introDone }) {
       {/* ABOUT */}
       <section className="band band-tint zoom-sec" id="about" data-nav="sand">
         <Reveal className="section-head">
-          <span className="kicker">01 — Who Is Quenchmark?</span>
+          <span className="kicker">Who We Are</span>
           <h2 className="about-headline">
             <span className="ah-small">Powering the</span>
             <span className="ah-image">next generation</span>
@@ -1119,7 +1187,7 @@ function Home({ nav, introDone }) {
       {/* VENTURES */}
       <section className="band zoom-sec" id="ventures" data-nav="creme">
         <Reveal className="section-head">
-          <span className="kicker">02 — Our Ecosystem</span>
+          <span className="kicker">Our Ecosystem</span>
           <h2><SplitText text="From one group, many industries." /></h2>
         </Reveal>
         <Reveal variant="zoom">
@@ -1128,10 +1196,12 @@ function Home({ nav, introDone }) {
             onMouseEnter={() => setVentPaused(true)}
             onMouseLeave={() => setVentPaused(false)}
           >
-            <div className="vs-bg" key={`bg-${activeVent}`} style={{ backgroundImage: `url(${ventures[activeVent].image})` }} />
+            <div className="vs-bg" key={`bg-${activeVent}`} style={{ backgroundImage: `url(${ventures[activeVent].shot || ventures[activeVent].image})` }} />
             <div className="vs-tint" key={`tint-${activeVent}`} style={{ background: ventures[activeVent].accent }} />
             <div className="vs-left" key={`txt-${activeVent}`}>
-              <span className="vs-eyebrow">{ventures[activeVent].icon}Our Ventures</span>
+              {ventures[activeVent].logo
+                ? <span className={`vs-logo-chip ${ventures[activeVent].logoDark ? "is-dark" : ""}`}><img src={ventures[activeVent].logo} alt={ventures[activeVent].title} /></span>
+                : <span className="vs-eyebrow">{ventures[activeVent].icon}Our Ventures</span>}
               <h3 className="vs-title">{ventures[activeVent].title}</h3>
               <p className="vs-desc">{ventures[activeVent].desc}</p>
               <ul className="vb-highlights vs-highlights">
@@ -1147,8 +1217,14 @@ function Home({ nav, introDone }) {
                   </div>
                 ))}
               </div>
-              <a className="vb-cta" href={ventures[activeVent].link} target="_blank" rel="noopener noreferrer">
-                Visit site →
+              <a
+                className="vb-cta"
+                role="button"
+                tabIndex={0}
+                onClick={() => startVisit(ventures[activeVent])}
+                onKeyDown={(e) => e.key === "Enter" && startVisit(ventures[activeVent])}
+              >
+                {ventures[activeVent].live === false ? "Launching soon" : "Visit site →"}
               </a>
             </div>
             <ul className="vs-nav">
@@ -1174,7 +1250,7 @@ function Home({ nav, introDone }) {
       {/* SERVICES & CAPABILITIES */}
       <section className="band band-tint zoom-sec" id="services" data-nav="sand">
         <Reveal className="section-head">
-          <span className="kicker">03 — Services &amp; Capabilities</span>
+          <span className="kicker">Services &amp; Capabilities</span>
           <h2><SplitText text="What we do, end to end." /></h2>
         </Reveal>
         <div className="grid grid-services">
@@ -1205,7 +1281,7 @@ function Home({ nav, introDone }) {
       {/* WHY CHOOSE */}
       <section className="band band-mist zoom-sec" data-nav="pink">
         <Reveal className="section-head">
-          <span className="kicker">04 — Why Quenchmark</span>
+          <span className="kicker">Why Quenchmark</span>
           <h2><SplitText text="A tech-first, human-centered approach." /></h2>
         </Reveal>
         <div className="grid grid-features">
@@ -1240,7 +1316,7 @@ function Home({ nav, introDone }) {
       {/* REVIEWS */}
       <section className="band band-tint zoom-sec" id="reviews" data-nav="sand">
         <Reveal className="section-head">
-          <span className="kicker">05 — Reviews</span>
+          <span className="kicker">Reviews</span>
           <h2><SplitText text="Loved by partners and users." /></h2>
         </Reveal>
 
@@ -1311,6 +1387,54 @@ function Home({ nav, introDone }) {
           </div>
         </Reveal>
       </section>
+
+      {/* launching-soon card for ventures without a live site */}
+      {redirect && redirect.live === false && (
+        <div className="redirect-overlay" onClick={() => setRedirect(null)}>
+          <div className="redirect-card">
+            <span className="redirect-orbit" aria-hidden="true">
+              <span /><span /><span />
+              <img src={logoImg} className="redirect-logo" alt="" />
+            </span>
+            <h3>Launching soon</h3>
+            <p>{redirect.title} isn't live just yet — check back shortly.</p>
+            <button className="btn btn-solid" onClick={() => setRedirect(null)}>Got it</button>
+          </div>
+        </div>
+      )}
+
+      {/* live venture opens inside Quenchmark — closing returns to the exact spot */}
+      {redirect && redirect.live !== false && (
+        <div className="visit-overlay">
+          <div className="visit-bar">
+            <button className="visit-back" onClick={closeVisit}>
+              <span aria-hidden="true">←</span> Back to Quenchmark
+            </button>
+            <span className="visit-title">{redirect.title}</span>
+            <a className="visit-ext" href={redirect.link} target="_blank" rel="noopener noreferrer">
+              Open in new tab ↗
+            </a>
+          </div>
+          <div className="visit-stage">
+            {!frameLoaded && (
+              <div className="visit-loader">
+                <span className="redirect-orbit" aria-hidden="true">
+                  <span /><span /><span />
+                  <img src={logoImg} className="redirect-logo" alt="" />
+                </span>
+                <p>Loading {redirect.title}…</p>
+              </div>
+            )}
+            <iframe
+              className="visit-frame"
+              src={redirect.link}
+              title={redirect.title}
+              onLoad={() => setFrameLoaded(true)}
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }
