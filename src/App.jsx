@@ -3,11 +3,13 @@ import * as THREE from "three";
 import Lenis from "lenis";
 import { getProject } from "@theatre/core";
 import "./App.css";
-import logoImg from "./assets/quenchmark.jpeg";
+
+const logoImg = "/quenchmark-logo.png";
+const logoMarkImg = "/favicon-512.png";
 
 /* ---------- Theatre.js: cinematic hero entrance ---------- */
 const tkf = (position, value, connectedRight = true) => ({
-  id: `kf_${position}_${value}`.replace(/[.\-]/g, "_"),
+  id: `kf_${position}_${value}`.replace(/[.-]/g, "_"),
   position, connectedRight, handles: [0.5, 0, 0.25, 1], type: "bezier", value,
 });
 const ttrack = (name, keyframes) => ({ type: "BasicKeyframedTrack", __debugName: name, keyframes });
@@ -74,32 +76,10 @@ function setupTheatreHero() {
 
 /* ---------- line icons ---------- */
 const Icon = {
-  travel: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 12c0-1.1.9-2 2-2h3l5-6 2 .5L11 10h4l2-2 1.5.5L16 12l2.5 3.5L17 16l-2-2h-4l3 5.5-2 .5-5-6H4a2 2 0 0 1-2-2Z" />
-    </svg>
-  ),
-  shield: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3 5 6v5c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
-  ),
   chart: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 19V5M4 19h16" />
       <path d="m7 14 3-3 3 2 5-6" />
-    </svg>
-  ),
-  spark: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
-      <path d="M12 8a4 4 0 0 0 0 8 4 4 0 0 0 0-8Z" />
-    </svg>
-  ),
-  down: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 9l6 6 6-6" />
     </svg>
   ),
 };
@@ -107,7 +87,10 @@ const Icon = {
 const IMG = "https://images.unsplash.com/photo-";
 const ventures = [
   {
-    icon: Icon.travel, tag: "Travel Tech", category: "Travel Tech", title: "TripSoul",
+    tag: "Travel Tech", category: "Travel Tech", title: "TripSoul",
+    logo: "/tripsoul-logo.png",
+    markLogo: "/tripsoul-logo.png",
+    logoShape: "wide",
     desc: "Curated premium travel experiences — personalized planning, tailored itineraries, and local expert support.",
     link: "https://www.tripsoul.org",
     image: `${IMG}1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=80`,
@@ -120,7 +103,10 @@ const ventures = [
     highlights: ["Personalized trip planning", "Tailored itineraries", "On-ground local experts"],
   },
   {
-    icon: Icon.shield, tag: "Cybersecurity", category: "Cybersecurity", title: "ParameterX",
+    tag: "Cybersecurity", category: "Cybersecurity", title: "ParameterX",
+    logo: "/parameterx-logo.png",
+    markLogo: "/parameterx-logo.png",
+    logoShape: "wide",
     desc: "Advanced cybersecurity and technology solutions — threat detection, monitoring, and enterprise security infrastructure.",
     link: "https://www.parameterx.org",
     image: `${IMG}1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80`,
@@ -134,6 +120,8 @@ const ventures = [
   },
   {
     icon: Icon.chart, tag: "AI Finance", category: "AI Finance", title: "QuantMentor",
+    logo: null,
+    futureLogo: "/quantmentor-logo.png",
     desc: "AI-powered finance — algorithmic trading support, market analytics, and custom strategy building.",
     link: "https://www.quantmentor.org",
     image: `${IMG}1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1400&q=80`,
@@ -146,7 +134,10 @@ const ventures = [
     highlights: ["Algorithmic trading support", "Market analytics", "Custom strategy building"],
   },
   {
-    icon: Icon.spark, tag: "AI & Automation", category: "AI & Automation", title: "DMGennie",
+    tag: "AI & Automation", category: "AI & Automation", title: "DMGennie",
+    logo: "/dmgennie-logo.png",
+    markLogo: "/dmgennie-logo.png",
+    logoShape: "wide",
     desc: "AI-powered Instagram automation — smart DM replies, lead capture, and engagement workflows for creators and businesses.",
     link: "https://www.dmgennie.org",
     image: `${IMG}1620712943543-bcc4688e7485?auto=format&fit=crop&w=1400&q=80`,
@@ -160,35 +151,30 @@ const ventures = [
   },
 ];
 
-const services = [
-  { icon: Icon.travel, title: "Travel Tech", desc: "AI-driven travel platforms with smart pricing, route optimization, and curated experiences." },
-  { icon: Icon.shield, title: "Cybersecurity", desc: "Enterprise-grade protection, vulnerability assessments, and real-time threat monitoring." },
-  { icon: Icon.chart, title: "Algo Trading", desc: "Non-custodial algorithmic trading infrastructure with sub-second execution and custom strategies." },
-  { icon: Icon.spark, title: "AI & Automation", desc: "Custom AI solutions, LLM integrations, and intelligent automation for business workflows." },
-];
-
-const features = [
-  { no: "01", title: "Innovation First", desc: "We push boundaries with cutting-edge tech solutions that define the future." },
-  { no: "02", title: "Scale with Purpose", desc: "Every venture we build is designed for long-term, sustainable growth." },
-  { no: "03", title: "Execution Driven", desc: "Ideas are nothing without execution. We ship fast, and iterate faster." },
-  { no: "04", title: "Trust & Transparency", desc: "Transparency in operations, honesty with partners, and trust with users." },
-];
-
-const reviews = [
-  { name: "Aarav Mehta", role: "Startup Founder", rating: 5, date: "2 weeks ago", text: "Quenchmark transformed our security posture overnight. ParameterX is the real deal — fast, reliable, and proactive.", image: `${IMG}1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80` },
-  { name: "Sara Lin", role: "Product Lead", rating: 5, date: "1 month ago", text: "Their tech-first, human-centered approach is rare. Every detail felt considered and intentional.", image: `${IMG}1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80` },
-  { name: "Daniel Cruz", role: "Investor", rating: 4, date: "1 month ago", text: "From research to trading infrastructure, the depth across their ventures genuinely impressed us.", image: `${IMG}1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80` },
-  { name: "Priya Nair", role: "Travel Partner", rating: 5, date: "3 weeks ago", text: "TripSoul made our itinerary effortless — the on-ground local expert support was a real game changer.", image: `${IMG}1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80` },
-  { name: "Marcus Webb", role: "CTO", rating: 5, date: "2 months ago", text: "ParameterX caught vulnerabilities our previous vendor missed. The real-time monitoring is rock solid.", image: `${IMG}1463453091185-61582044d556?auto=format&fit=crop&w=200&q=80` },
-  { name: "Ananya Rao", role: "Content Creator", rating: 5, date: "1 week ago", text: "DMGennie automated my DMs and tripled my lead capture. Setup took only a few minutes.", image: `${IMG}1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80` },
-];
-const ratingAvg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+function VentureLogo({ venture, className = "", decorative = false, variant = "logo" }) {
+  const src = variant === "mark" ? venture.markLogo || venture.logo : venture.logo;
+  const brandClass = `${venture.title.toLowerCase().replace(/[^a-z0-9]+/g, "")}-logo`;
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={decorative ? "" : `${venture.title} logo`}
+        className={`venture-logo ${brandClass} ${variant === "mark" ? "is-mark" : ""} ${venture.logoShape === "wide" ? "is-wide" : ""} ${className}`}
+      />
+    );
+  }
+  return (
+    <span className={`venture-logo-fallback ${brandClass} ${className}`} aria-hidden="true">
+      {venture.icon}
+    </span>
+  );
+}
 
 const stats = [
   { num: 4, suffix: "+", label: "Active Ventures" },
-  { num: 50, suffix: "+", label: "Team Members" },
-  { num: 10, suffix: "K+", label: "Users Served" },
-  { num: 99.9, suffix: "%", decimals: 1, label: "Uptime" },
+  { num: 5, suffix: "+", label: "Business Verticals" },
+  { text: "Multiple", label: "Digital Products" },
+  { text: "India-based", label: "Global Vision" },
 ];
 
 const flow = [
@@ -276,52 +262,6 @@ function useScrollZoom() {
       window.removeEventListener("resize", onScroll);
     };
   }, []);
-}
-
-/* headline that splits into words, each flipping up in 3D (plays once revealed) */
-function Words3D({ segments, start = 300, step = 85, wild = false }) {
-  let idx = -1;
-  return (
-    <span className="words3d">
-      {segments.map((seg, si) =>
-        seg.text.split(" ").filter(Boolean).map((w, wi) => {
-          idx += 1;
-          const i = idx;
-          const dir = i % 2 ? 1 : -1;
-          const style = wild
-            ? {
-                animationDelay: `${start + i * step}ms`,
-                "--tx": `${dir * (70 + ((i * 23) % 60))}px`,
-                "--ty": `${(((i * 13) % 3) - 1) * 52}px`,
-                "--tz": `${-360 - (i % 4) * 130}px`,
-                "--rx": `${(((i * 7) % 3) - 1) * 55}deg`,
-                "--ry": `${dir * (50 + ((i * 29) % 40))}deg`,
-                "--rz": `${dir * (8 + ((i * 11) % 10))}deg`,
-              }
-            : {
-                animationDelay: `${start + i * step}ms`,
-                "--tx": "0px",
-                "--ty": "24px",
-                "--tz": "-70px",
-                "--rx": "-38deg",
-                "--ry": "0deg",
-                "--rz": "0deg",
-              };
-          return (
-            <span className="w3d" key={`${si}-${wi}`}>
-              <span
-                className={`w3d-inner ${seg.className || ""}`}
-                style={style}
-              >
-                {w}
-              </span>
-              {" "}
-            </span>
-          );
-        })
-      )}
-    </span>
-  );
 }
 
 /* heading that reveals word-by-word, each rising from behind a mask */
@@ -488,7 +428,7 @@ const HERO_FRAG = `
     if (d > 0.5) discard;
     float soft = smoothstep(0.5, 0.0, d); // feathered round mote
     vec3 col = mix(uColorA, uColorB, vGlow);
-    gl_FragColor = vec4(col, soft * (0.13 + vGlow * 0.5));
+    gl_FragColor = vec4(col, soft * (0.055 + vGlow * 0.24));
   }
 `;
 // subtle tint per section theme — the atmosphere shifts faintly as you scroll
@@ -516,7 +456,7 @@ function HeroThree() {
     camera.lookAt(0, 0, 0);
 
     // a cloud of soft motes scattered through a 3D volume
-    const COUNT = 1200;
+    const COUNT = 760;
     const positions = new Float32Array(COUNT * 3);
     const speeds = new Float32Array(COUNT);
     const phases = new Float32Array(COUNT);
@@ -541,7 +481,7 @@ function HeroThree() {
       uScroll: { value: 0 },
       uMouse: { value: new THREE.Vector2(999, 999) },
       uHover: { value: 0 },
-      uSize: { value: 22 * dpr },
+      uSize: { value: 17 * dpr },
       uColorA: { value: new THREE.Color("#b4a89d") }, // soft warm-grey base
       uColorB: { value: new THREE.Color(THEME_GLOW.creme) },
     };
@@ -846,9 +786,10 @@ function Navbar({ nav, page }) {
   return (
     <header className="nav-wrap">
       <nav className={`nav nav-theme-${theme}`}>
-        <span className="brand" onClick={() => { nav.section("home"); close(); }}>
-          <img src={logoImg} alt="Quenchmark" className="brand-logo" />
-          <span className="brand-name">Quenchmark</span>
+        <span className="brand" onClick={() => { nav.section("home"); close(); }} aria-label="Quenchmark home">
+          <span className="brand-logo-wrap">
+            <img src={logoImg} alt="Quenchmark" className="brand-logo" />
+          </span>
         </span>
 
         <ul className={`nav-links ${menuOpen ? "open" : ""}`}>
@@ -876,37 +817,40 @@ function Footer({ nav }) {
       <div className="footer-top">
         <div className="footer-brand">
           <div className="brand">
-            <img src={logoImg} alt="Quenchmark" className="brand-logo" />
-            <span className="brand-name">Quenchmark</span>
+            <span className="brand-logo-wrap">
+              <img src={logoImg} alt="Quenchmark" className="brand-logo" />
+            </span>
           </div>
-          <p>Empowering ventures in Travel, Technology, Cybersecurity &amp; AI Finance.</p>
+          <p>Building and scaling digital-first ventures across cybersecurity, AI, finance, travel, SaaS and automation.</p>
           <div className="footer-contact">
             <a href="mailto:official@quenchmark.org">official@quenchmark.org</a>
-            <span>Based in India 🇮🇳</span>
+            <span>India-based, global vision</span>
           </div>
         </div>
         <div className="footer-col">
           <h4>Ventures</h4>
-          <a onClick={() => nav.section("ventures")}>TripSoul</a>
           <a onClick={() => nav.section("ventures")}>ParameterX</a>
-          <a onClick={() => nav.section("ventures")}>Algo Trading</a>
-          <a onClick={() => nav.section("ventures")}>Quench AI</a>
+          <a onClick={() => nav.section("ventures")}>QuantMentor</a>
+          <a onClick={() => nav.section("ventures")}>TripSoul</a>
+          <a onClick={() => nav.section("ventures")}>DMGennie</a>
+        </div>
+        <div className="footer-col">
+          <h4>Services</h4>
+          <a onClick={() => nav.section("services")}>Cybersecurity Services</a>
+          <a onClick={() => nav.section("services")}>AI &amp; Automation</a>
+          <a onClick={() => nav.section("services")}>SaaS Platforms</a>
+          <a onClick={() => nav.section("services")}>Business Consulting</a>
         </div>
         <div className="footer-col">
           <h4>Company</h4>
           <a onClick={() => nav.section("about")}>About</a>
-          <a onClick={() => nav.section("services")}>Services</a>
-          <a onClick={() => nav.careers()}>Careers</a>
           <a onClick={() => nav.contact()}>Contact</a>
-        </div>
-        <div className="footer-col">
-          <h4>Legal</h4>
-          <a>Terms &amp; Conditions</a>
-          <a>Privacy Policy</a>
+          <a onClick={() => nav.careers()}>Careers</a>
+          <a href="mailto:official@quenchmark.org">Email Us</a>
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© 2026 Quenchmark Group. All rights reserved.</span>
+        <span>© 2026 Quenchmark. All rights reserved.</span>
         <span>Building digital futures.</span>
       </div>
     </footer>
@@ -947,20 +891,20 @@ function HubStage({ onPick }) {
           <button
             key={n.vt.title}
             type="button"
-            className={`node ${n.i === active ? "is-active" : ""}`}
+            className={`node orbit-node ${n.i === active ? "is-active" : ""}`}
             style={{ left: `${(n.x / 360) * 100}%`, top: `${(n.y / 360) * 100}%`, "--fc": HUB[n.i].c, "--d": `${n.i * 0.6}s` }}
             onMouseEnter={() => setActive(n.i)}
             onFocus={() => setActive(n.i)}
             onClick={() => { setActive(n.i); onPick && onPick(n.i); }}
             aria-label={`${n.vt.title} — view in Ventures`}
           >
-            <span className="node-dot">{n.vt.icon}</span>
-            <span className="node-name">{n.vt.title}</span>
+            <VentureLogo venture={n.vt} className="node-logo" decorative variant="mark" />
+            <span className="node-name venture-label">{n.vt.title}</span>
           </button>
         ))}
         <div className="hub-core">
           <span className="hub-ring" />
-          <img src={logoImg} alt="Quenchmark" className="hub-logo" />
+          <img src={logoMarkImg} alt="Quenchmark" className="hub-logo orbit-center-logo quenchmark-logo" />
         </div>
       </div>
       <div className="hub-caption" key={active}>
@@ -1021,8 +965,8 @@ function NumColumn({ kicker, title, items, variant }) {
 }
 
 /* ---------- HOME ---------- */
-function Home({ nav, introDone }) {
-  const [activeVent, setActiveVent] = useState(0);
+function Home({ nav }) {
+  const [activeVent, setActiveVent] = useState(1);
   const [ventPaused, setVentPaused] = useState(false);
   useScrollZoom();
   useEffect(() => {
@@ -1064,42 +1008,28 @@ function Home({ nav, introDone }) {
       </section>
 
       {/* ABOUT */}
-      <section className="band band-tint zoom-sec" id="about" data-nav="sand">
-        <Reveal className="section-head">
-          <span className="kicker">01 — Who Is Quenchmark?</span>
-          <h2 className="about-headline">
-            <span className="ah-small">Powering the</span>
-            <span className="ah-image">next generation</span>
-            <span className="ah-small">of businesses.</span>
-          </h2>
-        </Reveal>
-        <div className="about-split">
-          <Reveal className="about-copy" variant="left">
-            <p className="lead">
-              At Quenchmark Group, we accelerate business growth by combining world-class
-              systems, strategic leadership, and innovation-driven operations.
-            </p>
-            <p className="lead">
-              Our ecosystem supports forward-thinking ventures across travel, cybersecurity
-              &amp; tech services, and AI-powered financial solutions. We don't just build
-              products — we build market-defining companies.
+      <section className="band band-tint premium-section zoom-sec" id="about" data-nav="sand">
+        <div className="about-premium">
+          <Reveal className="about-premium-copy" variant="left">
+            <span className="kicker">About Quenchmark</span>
+            <h2>A multi-venture company building practical digital businesses.</h2>
+            <p>
+              Quenchmark is a multi-venture company focused on creating, operating and scaling high-value digital businesses. We work across cybersecurity, AI-powered products, financial research, travel technology, SaaS platforms and automation-driven solutions.
             </p>
           </Reveal>
-          <Reveal className="about-photo" variant="up" delay={120}>
-            <img
-              src={`${IMG}1600880292203-757bb62b4baf?auto=format&fit=crop&w=1100&q=80`}
-              alt="The Quenchmark team at work"
-            />
-            <div className="about-badge">
-              <strong>4+</strong>
-              <span>ventures built under<br />one vision</span>
-            </div>
+          <Reveal className="about-principles" delay={120}>
+            {["Create focused companies", "Operate with discipline", "Scale through systems"].map((item, i) => (
+              <div className="principle" key={item}>
+                <span>{String(i + 1).padStart(2, "0")}</span>
+                <strong>{item}</strong>
+              </div>
+            ))}
           </Reveal>
         </div>
       </section>
 
-      {/* MISSION & HOW WE WORK — two columns, 3D-animated numbers */}
-      <section className="band band-mist zoom-sec" id="mission" data-nav="pink">
+      {/* MISSION & HOW WE WORK */}
+      <section className="band band-mist zoom-sec" id="services" data-nav="pink">
         <div className="m2-grid">
           <NumColumn
             kicker="Our Mission"
@@ -1117,7 +1047,7 @@ function Home({ nav, introDone }) {
       </section>
 
       {/* VENTURES */}
-      <section className="band zoom-sec" id="ventures" data-nav="creme">
+      <section className="band zoom-sec premium-section" id="ventures" data-nav="creme">
         <Reveal className="section-head">
           <span className="kicker">02 — Our Ecosystem</span>
           <h2><SplitText text="From one group, many industries." /></h2>
@@ -1131,7 +1061,15 @@ function Home({ nav, introDone }) {
             <div className="vs-bg" key={`bg-${activeVent}`} style={{ backgroundImage: `url(${ventures[activeVent].image})` }} />
             <div className="vs-tint" key={`tint-${activeVent}`} style={{ background: ventures[activeVent].accent }} />
             <div className="vs-left" key={`txt-${activeVent}`}>
-              <span className="vs-eyebrow">{ventures[activeVent].icon}Our Ventures</span>
+              <span className="vs-eyebrow">
+                <VentureLogo venture={ventures[activeVent]} className="vs-eyebrow-logo" decorative variant="mark" />
+                Our Ventures
+              </span>
+              {ventures[activeVent].logo && (
+                <div className="vs-brand-card showcase-logo-badge">
+                  <VentureLogo venture={ventures[activeVent]} className="vs-brand-logo" />
+                </div>
+              )}
               <h3 className="vs-title">{ventures[activeVent].title}</h3>
               <p className="vs-desc">{ventures[activeVent].desc}</p>
               <ul className="vb-highlights vs-highlights">
@@ -1160,6 +1098,9 @@ function Home({ nav, introDone }) {
                   onClick={() => setActiveVent(i)}
                 >
                   <span className="vs-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="vs-item-mark showcase-list-logo" aria-hidden="true">
+                    <VentureLogo venture={v} className="vs-item-logo" decorative variant="mark" />
+                  </span>
                   <span className="vs-item-text">
                     <span className="vs-item-name">{v.title}</span>
                     <span className="vs-item-cat">{v.category}</span>
@@ -1171,28 +1112,25 @@ function Home({ nav, introDone }) {
         </Reveal>
       </section>
 
-      {/* SERVICES & CAPABILITIES */}
-      <section className="band band-tint zoom-sec" id="services" data-nav="sand">
-        <Reveal className="section-head">
-          <span className="kicker">03 — Services &amp; Capabilities</span>
-          <h2><SplitText text="What we do, end to end." /></h2>
+      {/* STATS */}
+      <section className="stats-band credibility-band zoom-sec" data-nav="creme">
+        <Reveal>
+          <p className="stats-eyebrow">Credibility</p>
+          <h2 className="stats-title">A focused venture group with a broad operating field.</h2>
         </Reveal>
-        <div className="grid grid-services">
-          {services.map((s, i) => (
-            <Reveal key={s.title} delay={i * 80}>
-              <TiltCard className="service">
-                <span className="service-icon">{s.icon}</span>
-                <div>
-                  <h3>{s.title}</h3>
-                  <p>{s.desc}</p>
-                </div>
-              </TiltCard>
-            </Reveal>
+        <Reveal className="stats-strip">
+          {stats.map((s) => (
+            <div className="stat" key={s.label}>
+              <span className="stat-val">
+                {s.text || <CountUp to={s.num} suffix={s.suffix} decimals={s.decimals || 0} />}
+              </span>
+              <span className="stat-lab">{s.label}</span>
+            </div>
           ))}
-        </div>
+        </Reveal>
       </section>
 
-      {/* STATEMENT — dark band with animated glow + shimmering text */}
+      {/* STATEMENT */}
       <section className="statement-band zoom-sec" data-nav="dark">
         <StatementThree />
         <Reveal>
@@ -1202,90 +1140,22 @@ function Home({ nav, introDone }) {
         </Reveal>
       </section>
 
-      {/* WHY CHOOSE */}
-      <section className="band band-mist zoom-sec" data-nav="pink">
-        <Reveal className="section-head">
-          <span className="kicker">04 — Why Quenchmark</span>
-          <h2><SplitText text="A tech-first, human-centered approach." /></h2>
-        </Reveal>
-        <div className="grid grid-features">
-          {features.map((f, i) => (
-            <Reveal key={f.title} delay={i * 80}>
-              <TiltCard className="feature">
-                <span className="feature-no">{f.no}</span>
-                <h3>{f.title}</h3>
-                <p>{f.desc}</p>
-              </TiltCard>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* STATS — standalone dark band */}
-      <section className="stats-band zoom-sec" data-nav="creme">
-        <Reveal>
-          <p className="stats-eyebrow">By the Numbers</p>
-          <h2 className="stats-title">Built on momentum, measured by impact.</h2>
-        </Reveal>
-        <Reveal className="stats-strip">
-          {stats.map((s) => (
-            <div className="stat" key={s.label}>
-              <span className="stat-val"><CountUp to={s.num} suffix={s.suffix} decimals={s.decimals || 0} /></span>
-              <span className="stat-lab">{s.label}</span>
-            </div>
-          ))}
-        </Reveal>
-      </section>
-
-      {/* REVIEWS */}
-      <section className="band band-tint zoom-sec" id="reviews" data-nav="sand">
-        <Reveal className="section-head">
-          <span className="kicker">05 — Reviews</span>
-          <h2><SplitText text="Loved by partners and users." /></h2>
-        </Reveal>
-
-        <div className="reviews-wrap">
-          <Reveal className="rating-summary" variant="left">
-            <div className="rating-big">{ratingAvg}</div>
-            <Stars rating={5} />
-            <p className="rating-count">Based on {reviews.length * 20}+ verified reviews</p>
-            <div className="rating-bars">
-              {[
-                { s: 5, w: "88%" },
-                { s: 4, w: "9%" },
-                { s: 3, w: "2%" },
-                { s: 2, w: "1%" },
-                { s: 1, w: "0%" },
-              ].map((b) => (
-                <div className="rating-bar" key={b.s}>
-                  <span className="rb-label">{b.s}★</span>
-                  <span className="rb-track"><span className="rb-fill" style={{ width: b.w }} /></span>
-                  <span className="rb-pct">{b.w}</span>
-                </div>
-              ))}
-            </div>
+      {/* LEADERSHIP */}
+      <section className="band band-mist zoom-sec premium-section" data-nav="pink">
+        <div className="leadership">
+          <Reveal className="leadership-copy" variant="left">
+            <span className="kicker">Leadership</span>
+            <h2>Built with a founder-led vision</h2>
+            <p>
+              Prince Saini is the Founder of Quenchmark, building technology-driven ventures across AI, SaaS, travel, and digital products. He focuses on creating scalable businesses that solve real-world problems through innovation and thoughtful execution.
+            </p>
           </Reveal>
-
-          <div className="reviews-grid">
-            {reviews.map((r, i) => (
-              <Reveal key={r.name} delay={i * 70}>
-                <TiltCard className="review-card" max={7}>
-                  <header className="review-head">
-                    <img className="review-avatar" src={r.image} alt={r.name} loading="lazy" />
-                    <div className="review-who">
-                      <strong>{r.name}</strong>
-                      <span>{r.role}</span>
-                    </div>
-                  </header>
-                  <div className="review-meta">
-                    <Stars rating={r.rating} />
-                    <time>{r.date}</time>
-                  </div>
-                  <p>{r.text}</p>
-                </TiltCard>
-              </Reveal>
-            ))}
-          </div>
+          <Reveal className="founder-card" delay={120}>
+            <span className="founder-initials">PS</span>
+            <h3>Prince Saini</h3>
+            <strong>Founder, Quenchmark</strong>
+            <p>Entrepreneur | Venture Builder | Product Founder</p>
+          </Reveal>
         </div>
       </section>
 
@@ -1401,7 +1271,7 @@ function ContactPage() {
 }
 
 /* ---------- CAREERS PAGE ---------- */
-function CareersPage({ nav }) {
+function CareersPage() {
   return (
     <main className="screen" data-nav="creme">
       <div className="aurora" />
@@ -1451,7 +1321,7 @@ function App() {
       try {
         theatreHero.sheet.sequence.position = 0;
         theatreHero.sheet.sequence.play({ range: [0, 2.4], iterationCount: 1, rate: 1 });
-      } catch (e) { /* no-op */ }
+      } catch { /* no-op */ }
     });
   }, [intro]);
 
