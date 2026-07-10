@@ -12,8 +12,6 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@theatre/core": "^0.7.2",
-    "@theatre/studio": "^0.7.2",
     "lenis": "^1.3.23",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

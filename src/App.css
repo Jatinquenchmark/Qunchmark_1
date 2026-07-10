@@ -10,7 +10,7 @@
 @keyframes drawLine { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 .revealed .nav-wrap { animation: enterDown 0.7s ease both; }
 
-/* hero groups are driven by Theatre.js — pure fade in place (no shifting) */
+/* hero groups fade in after the intro without layout shifting */
 .hero-main {
   perspective: 1100px;
   opacity: var(--hm-o, 1);
@@ -59,12 +59,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border: 0;
   font-weight: 600;
   font-size: 0.95rem;
   padding: 0.85rem 1.7rem;
   border-radius: 999px;
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+.btn:focus-visible,
+.brand-button:focus-visible,
+.nav-links button:focus-visible,
+.burger:focus-visible,
+.footer-col button:focus-visible,
+.footer-col a:focus-visible,
+.flow-toggle:focus-visible,
+.node:focus-visible,
+.scroll-btn:focus-visible,
+.modal-close:focus-visible {
+  outline: 2px solid rgba(176, 122, 85, 0.78);
+  outline-offset: 4px;
 }
 .btn-solid {
   background: var(--accent);
@@ -123,24 +137,24 @@
   max-height: 100%;
 }
 .tripsoul-logo {
-  max-width: 68%;
-  max-height: 68%;
+  max-width: 88%;
+  max-height: 72%;
 }
 .parameterx-logo {
-  max-width: 88%;
+  max-width: 92%;
   max-height: 46%;
 }
 .dmgennie-logo {
-  max-width: 74%;
-  max-height: 56%;
+  max-width: 92%;
+  max-height: 52%;
 }
 .quantmentor-logo {
   max-width: 58%;
   max-height: 58%;
 }
 .quenchmark-logo {
-  max-width: 64%;
-  max-height: 64%;
+  max-width: 88%;
+  max-height: 68%;
 }
 
 /* reveal animation — directional variants */
@@ -259,7 +273,7 @@
 }
 .nav-theme-dark .brand-name { color: #fff; }
 .nav-theme-dark .nav-links { color: rgba(255, 255, 255, 0.82); }
-.nav-theme-dark .nav-links a:hover { color: #fff; }
+.nav-theme-dark .nav-links button:hover { color: #fff; }
 .nav-theme-dark .burger span { background: #fff; }
 .nav-theme-dark .nav-cta {
   background: #fff;
@@ -275,19 +289,27 @@
   cursor: pointer;
   min-width: 0;
 }
+.brand-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
 .nav-mobile-only { display: none; }
 .brand-logo-wrap {
   display: flex;
   align-items: center;
   width: auto;
   height: 44px;
+  max-width: 170px;
   flex: 0 0 auto;
 }
 .brand-logo {
   display: block;
-  width: 170px;
-  height: 44px;
+  width: auto;
+  height: auto;
   max-width: 100%;
+  max-height: 44px;
   object-fit: contain;
   object-position: left center;
 }
@@ -305,8 +327,17 @@
   font-weight: 500;
   color: var(--ink-soft);
 }
-.nav-links a { position: relative; padding: 0.3rem 0; cursor: pointer; transition: color 0.2s; }
-.nav-links a::after {
+.nav-links button {
+  position: relative;
+  padding: 0.3rem 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  transition: color 0.2s;
+}
+.nav-links button::after {
   content: "";
   position: absolute;
   left: 0; bottom: -2px;
@@ -314,8 +345,8 @@
   background: var(--accent);
   transition: width 0.25s ease;
 }
-.nav-links a:hover { color: var(--ink); }
-.nav-links a:hover::after { width: 100%; }
+.nav-links button:hover { color: var(--ink); }
+.nav-links button:hover::after { width: 100%; }
 .nav-cta { padding: 0.6rem 1.3rem; font-size: 0.9rem; }
 
 .burger {
@@ -1652,32 +1683,32 @@
   color: var(--espresso);
 }
 .showcase-list-logo .tripsoul-logo {
-  max-width: 72%;
-  max-height: 94%;
+  max-width: 96%;
+  max-height: 84%;
 }
 .showcase-list-logo .parameterx-logo {
-  max-width: 74%;
-  max-height: 94%;
+  max-width: 98%;
+  max-height: 66%;
 }
 .showcase-list-logo .dmgennie-logo {
-  max-width: 90%;
-  max-height: 88%;
+  max-width: 98%;
+  max-height: 64%;
 }
 .showcase-list-logo .quantmentor-logo {
   max-width: 76%;
   max-height: 76%;
 }
 .showcase-logo-badge .tripsoul-logo {
-  max-width: 82%;
-  max-height: 76%;
+  max-width: 92%;
+  max-height: 82%;
 }
 .showcase-logo-badge .parameterx-logo {
-  max-width: 88%;
-  max-height: 70%;
+  max-width: 94%;
+  max-height: 72%;
 }
 .showcase-logo-badge .dmgennie-logo {
-  max-width: 88%;
-  max-height: 70%;
+  max-width: 94%;
+  max-height: 72%;
 }
 .showcase-logo-badge .quantmentor-logo {
   max-width: 58%;
@@ -2160,15 +2191,22 @@
   font-weight: 600;
   letter-spacing: 0.02em;
 }
-.footer-col a {
+.footer-col a,
+.footer-col button {
   display: block;
+  width: fit-content;
   font-size: 0.92rem;
   color: var(--footer-muted);
   padding: 0.3rem 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   transition: color 0.2s;
 }
-.footer-col a:hover { color: var(--accent-rose); }
+.footer-col a:hover,
+.footer-col button:hover { color: var(--accent-rose); }
 .footer-bottom {
   max-width: 1140px;
   margin: 0 auto;
@@ -2401,10 +2439,12 @@ section[id] {
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 860px) {
-  .brand-logo-wrap { height: 36px; }
-  .brand-logo {
-    width: 130px;
+  .brand-logo-wrap {
     height: 36px;
+    max-width: 130px;
+  }
+  .brand-logo {
+    max-height: 36px;
   }
   .nav-cta { display: none; }
   .burger { display: flex; }
@@ -2458,6 +2498,11 @@ section[id] {
   .about-split { grid-template-columns: 1fr; gap: 2rem; }
 }
 @media (max-width: 520px) {
+  .hero h1 {
+    max-width: 12.5ch;
+    font-size: clamp(1.85rem, 10.5vw, 2.35rem);
+    line-height: 1.04;
+  }
   .contact-form { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
@@ -2575,20 +2620,20 @@ section[id] {
   color: var(--fc);
 }
 .orbit-node .tripsoul-logo {
-  max-width: 82%;
-  max-height: 82%;
+  max-width: 90%;
+  max-height: 72%;
 }
 .orbit-node .parameterx-logo {
-  max-width: 82%;
-  max-height: 82%;
+  max-width: 92%;
+  max-height: 42%;
 }
 .orbit-node .dmgennie-logo {
-  max-width: 82%;
-  max-height: 70%;
+  max-width: 92%;
+  max-height: 42%;
 }
 .orbit-node .quantmentor-logo {
-  max-width: 70%;
-  max-height: 70%;
+  max-width: 84%;
+  max-height: 60%;
 }
 .orbit-node .venture-label { display: none; }
 .node-logo {
@@ -2642,8 +2687,8 @@ section[id] {
   display: block;
 }
 .hub-core .quenchmark-logo {
-  max-width: 72%;
-  max-height: 72%;
+  max-width: 88%;
+  max-height: 62%;
 }
 
 /* caption sits just under the hub (absolute so the core stays vertically centered) */
@@ -2750,4 +2795,12 @@ section[id] {
   }
   .stat:last-child { border-bottom: none; }
   .footer-top { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .hero h1 {
+    max-width: 12.5ch;
+    font-size: clamp(1.85rem, 10.5vw, 2.35rem);
+    line-height: 1.04;
+  }
 }

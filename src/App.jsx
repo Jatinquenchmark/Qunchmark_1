@@ -1,88 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import Lenis from "lenis";
-import { getProject } from "@theatre/core";
 import "./App.css";
 
 const logoImg = "/quenchmark-logo.png";
-const logoMarkImg = "/favicon-512.png";
-
-/* ---------- Theatre.js: cinematic hero entrance ---------- */
-const tkf = (position, value, connectedRight = true) => ({
-  id: `kf_${position}_${value}`.replace(/[.-]/g, "_"),
-  position, connectedRight, handles: [0.5, 0, 0.25, 1], type: "bezier", value,
-});
-const ttrack = (name, keyframes) => ({ type: "BasicKeyframedTrack", __debugName: name, keyframes });
-const HERO_STATE = {
-  sheetsById: {
-    Stage: {
-      staticOverrides: { byObject: {} },
-      sequence: {
-        subUnitsPerUnit: 30,
-        length: 2.4,
-        type: "PositionalSequence",
-        tracksByObject: {
-          Hero: {
-            trackData: {
-              tHmO: ttrack("hmO", [tkf(0, 0), tkf(0.85, 1)]),
-              tHmY: ttrack("hmY", [tkf(0, 42), tkf(1, 0)]),
-              tHmB: ttrack("hmB", [tkf(0, 14), tkf(0.8, 0)]),
-              tHfO: ttrack("hfO", [tkf(0.55, 0), tkf(1.5, 1)]),
-              tHfY: ttrack("hfY", [tkf(0.55, 50), tkf(1.5, 0)]),
-            },
-            trackIdByPropPath: {
-              '["hmO"]': "tHmO",
-              '["hmY"]': "tHmY",
-              '["hmB"]': "tHmB",
-              '["hfO"]': "tHfO",
-              '["hfY"]': "tHfY",
-            },
-          },
-        },
-      },
-    },
-  },
-  definitionVersion: "0.4.0",
-  revisionHistory: [],
-};
-
-let theatreHero = null;
-function setupTheatreHero() {
-  if (theatreHero) return theatreHero;
-  try {
-    const project = getProject("Quenchmark", { state: HERO_STATE });
-    const sheet = project.sheet("Stage");
-    const obj = sheet.object("Hero", { hmO: 1, hmY: 0, hmB: 0, hfO: 1, hfY: 0 });
-    obj.onValuesChange((v) => {
-      const main = document.querySelector(".hero-main");
-      const flow = document.querySelector(".hero-flow");
-      if (main) {
-        main.style.setProperty("--hm-o", v.hmO);
-        main.style.setProperty("--hm-y", `${v.hmY}px`);
-        main.style.setProperty("--hm-b", `${v.hmB}px`);
-      }
-      if (flow) {
-        flow.style.setProperty("--hf-o", v.hfO);
-        flow.style.setProperty("--hf-y", `${v.hfY}px`);
-      }
-    });
-    theatreHero = { project, sheet };
-    return theatreHero;
-  } catch (e) {
-    console.warn("Theatre.js hero setup failed:", e);
-    return null;
-  }
-}
-
-/* ---------- line icons ---------- */
-const Icon = {
-  chart: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 19V5M4 19h16" />
-      <path d="m7 14 3-3 3 2 5-6" />
-    </svg>
-  ),
-};
+const logoMarkImg = "/quenchmark-logo.png";
 
 const IMG = "https://images.unsplash.com/photo-";
 const ventures = [
@@ -119,7 +41,7 @@ const ventures = [
     highlights: ["Real-time threat detection", "Vulnerability assessments", "Security infrastructure"],
   },
   {
-    icon: Icon.chart, tag: "AI Finance", category: "AI Finance", title: "QuantMentor",
+    tag: "AI Finance", category: "AI Finance", title: "QuantMentor",
     logo: null,
     futureLogo: "/quantmentor-logo.png",
     desc: "AI-powered finance — algorithmic trading support, market analytics, and custom strategy building.",
@@ -139,7 +61,7 @@ const ventures = [
     markLogo: "/dmgennie-logo.png",
     logoShape: "wide",
     desc: "AI-powered Instagram automation — smart DM replies, lead capture, and engagement workflows for creators and businesses.",
-    link: "https://www.dmgennie.org",
+    link: "http://dmgennie.in/",
     image: `${IMG}1620712943543-bcc4688e7485?auto=format&fit=crop&w=1400&q=80`,
     accent: "rgba(112, 58, 130, 0.44)",
     facts: [
@@ -152,21 +74,16 @@ const ventures = [
 ];
 
 function VentureLogo({ venture, className = "", decorative = false, variant = "logo" }) {
-  const src = variant === "mark" ? venture.markLogo || venture.logo : venture.logo;
-  const brandClass = `${venture.title.toLowerCase().replace(/[^a-z0-9]+/g, "")}-logo`;
-  if (src) {
-    return (
-      <img
-        src={src}
-        alt={decorative ? "" : `${venture.title} logo`}
-        className={`venture-logo ${brandClass} ${variant === "mark" ? "is-mark" : ""} ${venture.logoShape === "wide" ? "is-wide" : ""} ${className}`}
-      />
-    );
-  }
+  const requestedSrc = variant === "mark" ? venture.markLogo || venture.logo : venture.logo;
+  const src = requestedSrc || logoImg;
+  const fallbackClass = requestedSrc ? "" : "quenchmark-logo";
+  const brandClass = `${(venture.title || "Quenchmark").toLowerCase().replace(/[^a-z0-9]+/g, "")}-logo`;
   return (
-    <span className={`venture-logo-fallback ${brandClass} ${className}`} aria-hidden="true">
-      {venture.icon}
-    </span>
+    <img
+      src={src}
+      alt={decorative ? "" : `${venture.title || "Quenchmark"} logo`}
+      className={`venture-logo ${brandClass} ${fallbackClass} ${variant === "mark" ? "is-mark" : ""} ${venture.logoShape === "wide" || !requestedSrc ? "is-wide" : ""} ${className}`}
+    />
   );
 }
 
@@ -338,9 +255,9 @@ function MagneticButton({ children, className = "", onClick, strength = 0.35 }) 
     if (ref.current) ref.current.style.transform = "";
   };
   return (
-    <a ref={ref} className={`btn magnetic ${className}`} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave}>
+    <button ref={ref} type="button" className={`btn magnetic ${className}`} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave}>
       {children}
-    </a>
+    </button>
   );
 }
 
@@ -374,19 +291,6 @@ function CountUp({ to, suffix = "", decimals = 0 }) {
     return () => io.disconnect();
   }, [to]);
   return <span ref={ref}>{val.toFixed(decimals)}{suffix}</span>;
-}
-
-/* row of 5 stars filled to `rating` */
-function Stars({ rating }) {
-  return (
-    <span className="stars" aria-label={`${rating} out of 5 stars`}>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <svg key={n} className={`star ${n <= rating ? "filled" : ""}`} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.3l6.5-.9z" />
-        </svg>
-      ))}
-    </span>
-  );
 }
 
 /* soft, premium ambient atmosphere — slow warm light motes drifting in 3D
@@ -534,10 +438,10 @@ function HeroThree() {
     }
     function onScroll() { if (!scrollRaf) scrollRaf = requestAnimationFrame(probe); }
 
-    const clock = new THREE.Clock();
+    const startedAt = performance.now();
     let raf = 0;
     function tick() {
-      const t = clock.getElapsedTime();
+      const t = (performance.now() - startedAt) / 1000;
       uniforms.uTime.value = reduce ? 0 : t;
       uniforms.uHover.value += (hoverTarget - uniforms.uHover.value) * 0.05;
       uniforms.uColorB.value.lerp(glowTarget, 0.04);
@@ -654,11 +558,11 @@ function StatementThree() {
     let raf = 0, visible = true;
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 });
     io.observe(host);
-    const clock = new THREE.Clock();
+    const startedAt = performance.now();
     const tick = () => {
       raf = requestAnimationFrame(tick);
       if (!visible) return; // pause render while offscreen
-      const t = reduce ? 0 : clock.getElapsedTime();
+      const t = reduce ? 0 : (performance.now() - startedAt) / 1000;
       group.rotation.y = t * 0.16 + mx * 0.45;
       group.rotation.x = -0.2 + my * 0.3;
       camera.position.x += (mx * 0.5 - camera.position.x) * 0.04;
@@ -786,18 +690,18 @@ function Navbar({ nav, page }) {
   return (
     <header className="nav-wrap">
       <nav className={`nav nav-theme-${theme}`}>
-        <span className="brand" onClick={() => { nav.section("home"); close(); }} aria-label="Quenchmark home">
+        <button type="button" className="brand brand-button" onClick={() => { nav.section("home"); close(); }} aria-label="Quenchmark home">
           <span className="brand-logo-wrap">
             <img src={logoImg} alt="Quenchmark" className="brand-logo" />
           </span>
-        </span>
+        </button>
 
         <ul className={`nav-links ${menuOpen ? "open" : ""}`}>
           {sectionLinks.map(([label, id]) => (
-            <li key={id}><a onClick={() => { nav.section(id); close(); }}>{label}</a></li>
+            <li key={id}><button type="button" onClick={() => { nav.section(id); close(); }}>{label}</button></li>
           ))}
-          <li><a onClick={() => { nav.contact(); close(); }}>Contact</a></li>
-          <li className="nav-mobile-only"><a onClick={() => { nav.careers(); close(); }}>Careers</a></li>
+          <li><button type="button" onClick={() => { nav.contact(); close(); }}>Contact</button></li>
+          <li className="nav-mobile-only"><button type="button" onClick={() => { nav.careers(); close(); }}>Careers</button></li>
         </ul>
 
         <button className="btn btn-solid nav-cta" onClick={() => nav.careers()}>Careers</button>
@@ -829,23 +733,23 @@ function Footer({ nav }) {
         </div>
         <div className="footer-col">
           <h4>Ventures</h4>
-          <a onClick={() => nav.section("ventures")}>ParameterX</a>
-          <a onClick={() => nav.section("ventures")}>QuantMentor</a>
-          <a onClick={() => nav.section("ventures")}>TripSoul</a>
-          <a onClick={() => nav.section("ventures")}>DMGennie</a>
+          <button type="button" onClick={() => nav.section("ventures")}>ParameterX</button>
+          <button type="button" onClick={() => nav.section("ventures")}>QuantMentor</button>
+          <button type="button" onClick={() => nav.section("ventures")}>TripSoul</button>
+          <button type="button" onClick={() => nav.section("ventures")}>DMGennie</button>
         </div>
         <div className="footer-col">
           <h4>Services</h4>
-          <a onClick={() => nav.section("services")}>Cybersecurity Services</a>
-          <a onClick={() => nav.section("services")}>AI &amp; Automation</a>
-          <a onClick={() => nav.section("services")}>SaaS Platforms</a>
-          <a onClick={() => nav.section("services")}>Business Consulting</a>
+          <button type="button" onClick={() => nav.section("services")}>Cybersecurity Services</button>
+          <button type="button" onClick={() => nav.section("services")}>AI &amp; Automation</button>
+          <button type="button" onClick={() => nav.section("services")}>SaaS Platforms</button>
+          <button type="button" onClick={() => nav.section("services")}>Business Consulting</button>
         </div>
         <div className="footer-col">
           <h4>Company</h4>
-          <a onClick={() => nav.section("about")}>About</a>
-          <a onClick={() => nav.contact()}>Contact</a>
-          <a onClick={() => nav.careers()}>Careers</a>
+          <button type="button" onClick={() => nav.section("about")}>About</button>
+          <button type="button" onClick={() => nav.contact()}>Contact</button>
+          <button type="button" onClick={() => nav.careers()}>Careers</button>
           <a href="mailto:official@quenchmark.org">Email Us</a>
         </div>
       </div>
@@ -990,8 +894,8 @@ function Home({ nav }) {
               Travel, Cybersecurity &amp; AI&nbsp;Finance, all under one roof.
             </p>
             <div className="actions">
-              <a className="btn btn-solid" onClick={() => nav.section("ventures")}>Explore Ventures →</a>
-              <a className="btn btn-outline" onClick={() => nav.contact()}>Partner With Us</a>
+              <button type="button" className="btn btn-solid" onClick={() => nav.section("ventures")}>Explore Ventures →</button>
+              <button type="button" className="btn btn-outline" onClick={() => nav.contact()}>Partner With Us</button>
             </div>
           </div>
 
@@ -1313,18 +1217,6 @@ function App() {
   const [intro, setIntro] = useState("typing"); // typing -> moving -> done
   const lenisRef = useRef(null);
 
-  // Theatre.js cinematic hero entrance
-  useEffect(() => { setupTheatreHero(); }, []);
-  useEffect(() => {
-    if (intro !== "done" || !theatreHero) return;
-    theatreHero.project.ready.then(() => {
-      try {
-        theatreHero.sheet.sequence.position = 0;
-        theatreHero.sheet.sequence.play({ range: [0, 2.4], iterationCount: 1, rate: 1 });
-      } catch { /* no-op */ }
-    });
-  }, [intro]);
-
   // buttery momentum scrolling
   useEffect(() => {
     const lenis = new Lenis({
@@ -1410,9 +1302,9 @@ function App() {
       )}
       <div className={`page ${page !== "home" ? "page-locked" : ""} ${intro === "typing" ? "page-hidden" : "revealed"}`}>
         <Navbar nav={nav} page={page} />
-        {page === "home" && <Home nav={nav} introDone={intro === "done"} />}
+        {page === "home" && <Home nav={nav} />}
         {page === "contact" && <ContactPage />}
-        {page === "careers" && <CareersPage nav={nav} />}
+        {page === "careers" && <CareersPage />}
         {page === "home" ? <Footer nav={nav} /> : <MiniFooter />}
       </div>
     </>
