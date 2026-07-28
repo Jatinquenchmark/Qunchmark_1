@@ -4,5 +4,17 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "/", // Aapke repo ka naam yahan hona chahiye
+  base: "/",
+  build: {
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          motion: ["lenis"],
+          three: ["three"],
+        },
+      },
+    },
+  },
 })
