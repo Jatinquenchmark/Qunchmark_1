@@ -42,8 +42,8 @@ const ventures = [
   },
   {
     tag: "AI Finance", category: "AI Finance", title: "QuantMentor",
-    logo: null,
-    futureLogo: "/quantmentor-logo.png",
+    logo: "/quantmentor-logo.png",
+    markLogo: "/quantmentor-mark.png",
     desc: "AI-powered finance — algorithmic trading support, market analytics, and custom strategy building.",
     link: "https://www.quantmentor.org",
     image: `${IMG}1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1400&q=80`,
@@ -962,36 +962,64 @@ function Home({ nav }) {
             onMouseEnter={() => setVentPaused(true)}
             onMouseLeave={() => setVentPaused(false)}
           >
-            <div className="vs-bg" key={`bg-${activeVent}`} style={{ backgroundImage: `url(${ventures[activeVent].image})` }} />
-            <div className="vs-tint" key={`tint-${activeVent}`} style={{ background: ventures[activeVent].accent }} />
-            <div className="vs-left" key={`txt-${activeVent}`}>
-              <span className="vs-eyebrow">
-                <VentureLogo venture={ventures[activeVent]} className="vs-eyebrow-logo" decorative variant="mark" />
-                Our Ventures
-              </span>
-              {ventures[activeVent].logo && (
-                <div className="vs-brand-card showcase-logo-badge">
-                  <VentureLogo venture={ventures[activeVent]} className="vs-brand-logo" />
-                </div>
-              )}
-              <h3 className="vs-title">{ventures[activeVent].title}</h3>
-              <p className="vs-desc">{ventures[activeVent].desc}</p>
-              <ul className="vb-highlights vs-highlights">
-                {ventures[activeVent].highlights.map((h) => (
-                  <li key={h}>{h}</li>
-                ))}
-              </ul>
-              <div className="vb-facts vs-facts">
-                {ventures[activeVent].facts.map((f) => (
-                  <div className="vb-fact" key={f.label}>
-                    <span>{f.label}</span>
-                    <strong>{f.value}</strong>
+            {/* every backdrop stays mounted and cross-fades — remounting on each
+                hover made the panel flash black while the next image loaded */}
+            {ventures.map((v, i) => (
+              <div
+                key={`bg-${v.title}`}
+                className={`vs-bg ${i === activeVent ? "is-active" : ""}`}
+                style={{ backgroundImage: `url(${v.image})` }}
+                aria-hidden="true"
+              />
+            ))}
+            {ventures.map((v, i) => (
+              <div
+                key={`tint-${v.title}`}
+                className={`vs-tint ${i === activeVent ? "is-active" : ""}`}
+                style={{ background: v.accent }}
+                aria-hidden="true"
+              />
+            ))}
+            {/* all four panels overlap in one grid cell, so the block is always
+                as tall as the longest venture — switching can't resize the
+                showcase or slide the nav around under the cursor */}
+            <div className="vs-left-stack">
+              {ventures.map((v, i) => (
+                <div
+                  className={`vs-left ${i === activeVent ? "is-active" : ""}`}
+                  key={v.title}
+                  aria-hidden={i !== activeVent}
+                  inert={i !== activeVent}
+                >
+                  <span className="vs-eyebrow">
+                    <VentureLogo venture={v} className="vs-eyebrow-logo" decorative variant="mark" />
+                    Our Ventures
+                  </span>
+                  {v.logo && (
+                    <div className="vs-brand-card showcase-logo-badge">
+                      <VentureLogo venture={v} className="vs-brand-logo" />
+                    </div>
+                  )}
+                  <h3 className="vs-title">{v.title}</h3>
+                  <p className="vs-desc">{v.desc}</p>
+                  <ul className="vb-highlights vs-highlights">
+                    {v.highlights.map((h) => (
+                      <li key={h}>{h}</li>
+                    ))}
+                  </ul>
+                  <div className="vb-facts vs-facts">
+                    {v.facts.map((f) => (
+                      <div className="vb-fact" key={f.label}>
+                        <span>{f.label}</span>
+                        <strong>{f.value}</strong>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <a className="vb-cta" href={ventures[activeVent].link} target="_blank" rel="noopener noreferrer">
-                Visit site →
-              </a>
+                  <a className="vb-cta" href={v.link} target="_blank" rel="noopener noreferrer">
+                    Visit site →
+                  </a>
+                </div>
+              ))}
             </div>
             <ul className="vs-nav">
               {ventures.map((v, i) => (
@@ -1175,7 +1203,7 @@ function ContactPage() {
 }
 
 /* ---------- CAREERS PAGE ---------- */
-function CareersPage() {
+function CareersPage({ nav }) {
   return (
     <main className="screen" data-nav="creme">
       <div className="aurora" />
@@ -1186,15 +1214,17 @@ function CareersPage() {
           <h2>Build the future <span className="hl">with us.</span></h2>
           <p className="careers-sub">Curious, driven people wanted across these open roles.</p>
         </Reveal>
+        <Reveal className="positions-head" delay={60}>
+          <span className="positions-count">{positions.length} open roles</span>
+          <span className="positions-note">All roles are remote-friendly</span>
+        </Reveal>
         <div className="positions">
           {positions.map((p, i) => (
-            <Reveal key={p.title} delay={i * 70}>
+            <Reveal key={p.title} delay={120 + i * 60} className="position-row">
               <div className="position">
-                <div className="position-info">
-                  <span className="position-dept">{p.dept}</span>
-                  <h3>{p.title}</h3>
-                  <span className="position-type">{p.type} · Remote-friendly</span>
-                </div>
+                <span className="position-dept">{p.dept}</span>
+                <h3 className="position-title">{p.title}</h3>
+                <span className="position-type">{p.type}</span>
                 <button
                   className="btn btn-solid position-apply"
                   onClick={() => window.open("https://forms.gle/HAvVvmagcmJvxzn88", "_blank", "noopener,noreferrer")}
@@ -1205,6 +1235,14 @@ function CareersPage() {
             </Reveal>
           ))}
         </div>
+        <Reveal className="careers-cta" delay={140 + positions.length * 60}>
+          <span className="careers-cta-text">
+            Don&apos;t see a role that fits? We&apos;d still like to hear from you.
+          </span>
+          <button type="button" className="btn btn-outline careers-cta-btn" onClick={() => nav.contact()}>
+            Contact us for more info →
+          </button>
+        </Reveal>
       </div>
     </main>
   );
@@ -1304,7 +1342,7 @@ function App() {
         <Navbar nav={nav} page={page} />
         {page === "home" && <Home nav={nav} />}
         {page === "contact" && <ContactPage />}
-        {page === "careers" && <CareersPage />}
+        {page === "careers" && <CareersPage nav={nav} />}
         {page === "home" ? <Footer nav={nav} /> : <MiniFooter />}
       </div>
     </>
