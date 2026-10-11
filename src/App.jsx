@@ -1,112 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import Lenis from "lenis";
 import "./App.css";
+import { ventures, products } from "./brands";
+import { TechnologiesPage, HomeHero, VenturesTeaser } from "./Showcase";
+import { VenturesPage } from "./VenturesPage";
+import { TechTeaser, ClosingCTA } from "./HomeSections";
 
 const logoImg = "/quenchmark-logo.png";
-const logoMarkImg = "/quenchmark-logo.png";
-
-const IMG = "https://images.unsplash.com/photo-";
-const ventures = [
-  {
-    tag: "Travel Tech", category: "Travel Tech", title: "TripSoul",
-    logo: "/tripsoul-logo.png",
-    markLogo: "/tripsoul-logo.png",
-    logoShape: "wide",
-    desc: "Curated premium travel experiences — personalized planning, tailored itineraries, and local expert support.",
-    link: "https://www.tripsoul.org",
-    image: `${IMG}1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=80`,
-    accent: "rgba(176, 122, 60, 0.42)",
-    facts: [
-      { label: "Focus", value: "Premium Travel" },
-      { label: "Model", value: "B2C" },
-      { label: "Status", value: "Live" },
-    ],
-    highlights: ["Personalized trip planning", "Tailored itineraries", "On-ground local experts"],
-  },
-  {
-    tag: "Cybersecurity", category: "Cybersecurity", title: "ParameterX",
-    logo: "/parameterx-logo.png",
-    markLogo: "/parameterx-logo.png",
-    logoShape: "wide",
-    desc: "Advanced cybersecurity and technology solutions — threat detection, monitoring, and enterprise security infrastructure.",
-    link: "https://www.parameterx.org",
-    image: `${IMG}1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80`,
-    accent: "rgba(42, 84, 128, 0.46)",
-    facts: [
-      { label: "Focus", value: "Enterprise Security" },
-      { label: "Model", value: "B2B" },
-      { label: "Status", value: "Live" },
-    ],
-    highlights: ["Real-time threat detection", "Vulnerability assessments", "Security infrastructure"],
-  },
-  {
-    tag: "AI Finance", category: "AI Finance", title: "QuantMentor",
-    logo: "/quantmentor-logo.png",
-    markLogo: "/quantmentor-mark.png",
-    desc: "AI-powered finance — algorithmic trading support, market analytics, and custom strategy building.",
-    link: "https://www.quantmentor.org",
-    image: `${IMG}1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1400&q=80`,
-    accent: "rgba(40, 110, 82, 0.44)",
-    facts: [
-      { label: "Focus", value: "AI Trading" },
-      { label: "Model", value: "B2C" },
-      { label: "Status", value: "Live" },
-    ],
-    highlights: ["Algorithmic trading support", "Market analytics", "Custom strategy building"],
-  },
-  {
-    tag: "AI & Automation", category: "AI & Automation", title: "DMGennie",
-    logo: "/dmgennie-logo.png",
-    markLogo: "/dmgennie-logo.png",
-    logoShape: "wide",
-    desc: "AI-powered Instagram automation — smart DM replies, lead capture, and engagement workflows for creators and businesses.",
-    link: "http://dmgennie.in/",
-    image: `${IMG}1620712943543-bcc4688e7485?auto=format&fit=crop&w=1400&q=80`,
-    accent: "rgba(112, 58, 130, 0.44)",
-    facts: [
-      { label: "Focus", value: "Social Automation" },
-      { label: "Model", value: "SaaS" },
-      { label: "Status", value: "Live" },
-    ],
-    highlights: ["Smart DM auto-replies", "Lead capture", "Engagement workflows"],
-  },
-];
-
-function VentureLogo({ venture, className = "", decorative = false, variant = "logo" }) {
-  const requestedSrc = variant === "mark" ? venture.markLogo || venture.logo : venture.logo;
-  const src = requestedSrc || logoImg;
-  const fallbackClass = requestedSrc ? "" : "quenchmark-logo";
-  const brandClass = `${(venture.title || "Quenchmark").toLowerCase().replace(/[^a-z0-9]+/g, "")}-logo`;
-  return (
-    <img
-      src={src}
-      alt={decorative ? "" : `${venture.title || "Quenchmark"} logo`}
-      className={`venture-logo ${brandClass} ${fallbackClass} ${variant === "mark" ? "is-mark" : ""} ${venture.logoShape === "wide" || !requestedSrc ? "is-wide" : ""} ${className}`}
-    />
-  );
-}
-
-const stats = [
-  { num: 4, suffix: "+", label: "Active Ventures" },
-  { num: 5, suffix: "+", label: "Business Verticals" },
-  { text: "Multiple", label: "Digital Products" },
-  { text: "India-based", label: "Global Vision" },
-];
-
-const flow = [
-  { title: "Discover", desc: "We identify untapped market opportunities through deep research and analysis." },
-  { title: "Design", desc: "Architect scalable solutions with user-centric design and cutting-edge tech." },
-  { title: "Build", desc: "Develop and iterate rapidly with agile methodologies and quality-first approach." },
-  { title: "Scale", desc: "Deploy, monitor, and optimize for growth with data-driven strategies." },
-];
-
-const values = [
-  { title: "Build to last", desc: "We engineer ventures for durability — real businesses, not vanity metrics." },
-  { title: "Ship with conviction", desc: "A bias to action. We move fast, decide clearly, and back ourselves." },
-  { title: "Honest by default", desc: "Transparency with partners, candor with our teams, trust with users." },
-  { title: "People over hype", desc: "Great teams build great companies — so we invest in people first." },
-];
 
 const positions = [
   { title: "HR & Operations", dept: "People", type: "Full-time" },
@@ -135,162 +36,6 @@ function Reveal({ children, className = "", delay = 0, variant = "up" }) {
       {children}
     </div>
   );
-}
-
-/* scroll-linked cinematic zoom: each section grows as it passes through the
-   viewport — recedes (small) below, full at centre, swells + fades as it exits
-   upward, "zooming through" into the next section. */
-function useScrollZoom() {
-  useEffect(() => {
-    const els = Array.from(document.querySelectorAll(".zoom-sec"));
-    if (!els.length) return;
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const vh = window.innerHeight || 1;
-      const dead = 0.2; // plateau where the centred section stays full-size
-      for (const el of els) {
-        const r = el.getBoundingClientRect();
-        const center = r.top + r.height / 2;
-        const d = (center - vh / 2) / vh; // 0 = centred, + below, - above
-        let t = (Math.abs(d) - dead) / (1 - dead);
-        t = Math.max(0, Math.min(1, t));
-        let scale, opacity;
-        if (d >= 0) {
-          // entering from below — rises up from a slightly smaller state
-          scale = 1 - t * 0.1;
-          opacity = 1 - t * 0.5;
-        } else {
-          // exiting upward — swells past the viewer and dissolves
-          scale = 1 + t * 0.12;
-          opacity = 1 - t * 0.55;
-        }
-        el.style.setProperty("--zs", scale.toFixed(4));
-        el.style.setProperty("--zo", Math.max(0, opacity).toFixed(3));
-      }
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
-}
-
-/* heading that reveals word-by-word, each rising from behind a mask */
-function SplitText({ text, className = "" }) {
-  const ref = useRef(null);
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => e.isIntersecting && setShown(true),
-      { threshold: 0.4 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  const words = text.split(" ");
-  return (
-    <span ref={ref} className={`split ${shown ? "is-in" : ""} ${className}`}>
-      {words.map((w, i) => (
-        <span className="split-word" key={i}>
-          <span className="split-inner" style={{ transitionDelay: `${i * 70}ms` }}>{w}</span>
-          {i < words.length - 1 ? " " : ""}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-/* card that tilts in 3D toward the cursor with a moving light-glare sweep */
-function TiltCard({ children, className = "", max = 9 }) {
-  const ref = useRef(null);
-  const onMove = (e) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    el.style.setProperty("--rx", (-(py - 0.5) * 2 * max).toFixed(2) + "deg");
-    el.style.setProperty("--ry", ((px - 0.5) * 2 * max).toFixed(2) + "deg");
-    el.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
-    el.style.setProperty("--my", (py * 100).toFixed(1) + "%");
-    el.style.setProperty("--glare", "1");
-  };
-  const onLeave = () => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.setProperty("--rx", "0deg");
-    el.style.setProperty("--ry", "0deg");
-    el.style.setProperty("--glare", "0");
-  };
-  return (
-    <div className="tilt" onMouseMove={onMove} onMouseLeave={onLeave}>
-      <div ref={ref} className={`tilt-inner ${className}`}>
-        {children}
-        <span className="tilt-glare" aria-hidden="true" />
-      </div>
-    </div>
-  );
-}
-
-/* button that leans toward the cursor and springs back on leave */
-function MagneticButton({ children, className = "", onClick, strength = 0.35 }) {
-  const ref = useRef(null);
-  const onMove = (e) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const x = e.clientX - (r.left + r.width / 2);
-    const y = e.clientY - (r.top + r.height / 2);
-    el.style.transform = `translate(${(x * strength).toFixed(1)}px, ${(y * strength * 1.2).toFixed(1)}px)`;
-  };
-  const onLeave = () => {
-    if (ref.current) ref.current.style.transform = "";
-  };
-  return (
-    <button ref={ref} type="button" className={`btn magnetic ${className}`} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave}>
-      {children}
-    </button>
-  );
-}
-
-/* count-up number that animates when scrolled into view */
-function CountUp({ to, suffix = "", decimals = 0 }) {
-  const ref = useRef(null);
-  const [val, setVal] = useState(0);
-  const started = useRef(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting || started.current) return;
-        started.current = true;
-        const dur = 1500;
-        let start = null;
-        const tick = (ts) => {
-          if (start === null) start = ts;
-          const p = Math.min((ts - start) / dur, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          setVal(to * eased);
-          if (p < 1) requestAnimationFrame(tick);
-          else setVal(to);
-        };
-        requestAnimationFrame(tick);
-      },
-      { threshold: 0.4 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [to]);
-  return <span ref={ref}>{val.toFixed(decimals)}{suffix}</span>;
 }
 
 /* soft, premium ambient atmosphere — slow warm light motes drifting in 3D
@@ -337,10 +82,10 @@ const HERO_FRAG = `
 `;
 // subtle tint per section theme — the atmosphere shifts faintly as you scroll
 const THEME_GLOW = {
-  creme: "#b8ada2",
-  sand: "#b3a695",
-  pink: "#bdaba4",
-  dark: "#a89e94",
+  creme: "#a9b0c2",
+  sand: "#a3abc0",
+  pink: "#adb3c6",
+  dark: "#8f97b0",
 };
 function HeroThree() {
   const ref = useRef(null);
@@ -349,7 +94,7 @@ function HeroThree() {
     if (!canvas) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25); // soft motes: no need for full retina
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(dpr);
     renderer.setClearAlpha(0);
@@ -360,7 +105,7 @@ function HeroThree() {
     camera.lookAt(0, 0, 0);
 
     // a cloud of soft motes scattered through a 3D volume
-    const COUNT = 760;
+    const COUNT = 420;
     const positions = new Float32Array(COUNT * 3);
     const speeds = new Float32Array(COUNT);
     const phases = new Float32Array(COUNT);
@@ -386,7 +131,7 @@ function HeroThree() {
       uMouse: { value: new THREE.Vector2(999, 999) },
       uHover: { value: 0 },
       uSize: { value: 17 * dpr },
-      uColorA: { value: new THREE.Color("#b4a89d") }, // soft warm-grey base
+      uColorA: { value: new THREE.Color("#a6adbd") }, // soft cool-grey base
       uColorB: { value: new THREE.Color(THEME_GLOW.creme) },
     };
     const mat = new THREE.ShaderMaterial({
@@ -441,6 +186,8 @@ function HeroThree() {
     const startedAt = performance.now();
     let raf = 0;
     function tick() {
+      // don't spend GPU time while the tab is in the background
+      if (document.hidden) { raf = requestAnimationFrame(tick); return; }
       const t = (performance.now() - startedAt) / 1000;
       uniforms.uTime.value = reduce ? 0 : t;
       uniforms.uHover.value += (hoverTarget - uniforms.uHover.value) * 0.05;
@@ -486,7 +233,7 @@ function StatementThree() {
     if (!canvas) return;
     const host = canvas.parentElement;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(dpr);
     renderer.setClearAlpha(0);
@@ -621,45 +368,46 @@ function Typewriter({ parts, speed = 42, startDelay = 350, onDone }) {
   );
 }
 
-/* scramble/decode text — letters shuffle then resolve into the target */
-const SCRAMBLE_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*!?";
-function scrambleStr(t) {
-  return t
-    .split("")
-    .map((c) => (c === " " || c === "." ? c : SCRAMBLE_GLYPHS[Math.floor(Math.random() * SCRAMBLE_GLYPHS.length)]))
-    .join("");
-}
-function Scramble({ text, className = "", active = true }) {
-  const [out, setOut] = useState(() => scrambleStr(text));
-  const ran = useRef(false);
-  useEffect(() => {
-    if (!active || ran.current) return;
-    ran.current = true;
-    let ticks = 0, timer;
-    const run = () => {
-      ticks += 1;
-      const reveal = Math.floor(ticks / 2);
-      let s = "";
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-        if (ch === " " || ch === ".") { s += ch; continue; }
-        s += i < reveal ? ch : SCRAMBLE_GLYPHS[Math.floor(Math.random() * SCRAMBLE_GLYPHS.length)];
-      }
-      setOut(s);
-      if (reveal <= text.length) timer = setTimeout(run, 45);
-      else setOut(text);
-    };
-    timer = setTimeout(run, 45);
-    return () => clearTimeout(timer);
-  }, [active, text]);
-  return <span className={className}>{out}</span>;
+/* light / dark switch — the choice is saved and applied before paint (see index.html) */
+function ThemeToggle() {
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || "light");
+  const flip = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    const root = document.documentElement;
+    root.classList.add("theme-anim");
+    root.dataset.theme = next;
+    window.setTimeout(() => root.classList.remove("theme-anim"), 450);
+    try { localStorage.setItem("qm-theme", next); } catch { /* storage blocked: theme still applies for this visit */ }
+    setTheme(next);
+  };
+  const dark = theme === "dark";
+  return (
+    <button
+      type="button"
+      className="theme-toggle"
+      onClick={flip}
+      aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+      title={dark ? "Light theme" : "Dark theme"}
+    >
+      <span className={`tt-icon ${dark ? "" : "is-on"}`} aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+      </span>
+      <span className={`tt-icon ${dark ? "is-on" : ""}`} aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+      </span>
+    </button>
+  );
 }
 
 /* ---------- NAVBAR ---------- */
 function Navbar({ nav, page }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState("creme");
-  const sectionLinks = [["Home", "home"], ["About", "about"], ["Ventures", "ventures"], ["Services", "services"]];
+  // [label, target, kind] — "section" scrolls the home page, "page" opens a full page
+  const links = [
+    ["Home", "home", "section"], ["About", "about", "section"], ["Ventures", "ventures", "page"],
+    ["Technologies", "technologies", "page"], ["Approach", "approach", "section"],
+  ];
   const close = () => setMenuOpen(false);
 
   // match the navbar colour to whichever section sits under it
@@ -697,14 +445,25 @@ function Navbar({ nav, page }) {
         </button>
 
         <ul className={`nav-links ${menuOpen ? "open" : ""}`}>
-          {sectionLinks.map(([label, id]) => (
-            <li key={id}><button type="button" onClick={() => { nav.section(id); close(); }}>{label}</button></li>
+          {links.map(([label, id, kind]) => (
+            <li key={id}>
+              <button
+                type="button"
+                className={kind === "page" && page === id ? "is-current" : ""}
+                onClick={() => { if (kind === "page") nav.open(id); else nav.section(id); close(); }}
+              >
+                {label}
+              </button>
+            </li>
           ))}
           <li><button type="button" onClick={() => { nav.contact(); close(); }}>Contact</button></li>
           <li className="nav-mobile-only"><button type="button" onClick={() => { nav.careers(); close(); }}>Careers</button></li>
         </ul>
 
-        <button className="btn btn-solid nav-cta" onClick={() => nav.careers()}>Careers</button>
+        <div className="nav-right">
+          <ThemeToggle />
+          <button className="btn btn-solid nav-cta" onClick={() => nav.careers()}>Careers</button>
+        </div>
 
         <button className={`burger ${menuOpen ? "open" : ""}`} aria-label="Menu" onClick={() => setMenuOpen((v) => !v)}>
           <span></span><span></span><span></span>
@@ -733,17 +492,22 @@ function Footer({ nav }) {
         </div>
         <div className="footer-col">
           <h4>Ventures</h4>
-          <button type="button" onClick={() => nav.section("ventures")}>ParameterX</button>
-          <button type="button" onClick={() => nav.section("ventures")}>QuantMentor</button>
-          <button type="button" onClick={() => nav.section("ventures")}>TripSoul</button>
-          <button type="button" onClick={() => nav.section("ventures")}>DMGennie</button>
+          {ventures.map((v) => (
+            <button type="button" key={v.key} onClick={() => nav.open("ventures", v.chapter)}>{v.title}</button>
+          ))}
         </div>
         <div className="footer-col">
-          <h4>Services</h4>
-          <button type="button" onClick={() => nav.section("services")}>Cybersecurity Services</button>
-          <button type="button" onClick={() => nav.section("services")}>AI &amp; Automation</button>
-          <button type="button" onClick={() => nav.section("services")}>SaaS Platforms</button>
-          <button type="button" onClick={() => nav.section("services")}>Business Consulting</button>
+          <h4>Technologies</h4>
+          {products.map((p) => (
+            <button type="button" key={p.key} onClick={() => nav.open("technologies", p.chapter)}>{p.title}</button>
+          ))}
+        </div>
+        <div className="footer-col">
+          <h4>What we do</h4>
+          <button type="button" onClick={() => nav.open("ventures", "v-parameterx")}>Cybersecurity</button>
+          <button type="button" onClick={() => nav.open("ventures", "v-tripsoul")}>Travel</button>
+          <button type="button" onClick={() => nav.open("technologies")}>SaaS products</button>
+          <button type="button" onClick={() => nav.section("approach")}>Our approach</button>
         </div>
         <div className="footer-col">
           <h4>Company</h4>
@@ -761,79 +525,45 @@ function Footer({ nav }) {
   );
 }
 
-/* central Quenchmark hub wired to the 4 ventures; the picked spoke energises
-   and the hub glows that venture's colour */
-const HUB = [
-  { c: "#d99a4e", c2: "#bd7d32" }, // TripSoul — amber
-  { c: "#5a8fcc", c2: "#36639b" }, // ParameterX — blue
-  { c: "#57a87b", c2: "#347d54" }, // QuantMentor — green
-  { c: "#9b6fbe", c2: "#6f4593" }, // DMGennie — violet
+const flow = [
+  { title: "Discover", desc: "We identify untapped market opportunities through deep research and analysis." },
+  { title: "Design", desc: "Architect scalable solutions with user-centric design and cutting-edge tech." },
+  { title: "Build", desc: "Develop and iterate rapidly with agile methodologies and quality-first approach." },
+  { title: "Scale", desc: "Deploy, monitor, and optimize for growth with data-driven strategies." },
 ];
-function HubStage({ onPick }) {
-  const [active, setActive] = useState(0);
-  const v = ventures[active];
-  const { c, c2 } = HUB[active];
-  const cx = 180, cy = 180, R = 122;
-  const nodes = ventures.map((vt, i) => {
-    const ang = ((-90 + i * (360 / ventures.length)) * Math.PI) / 180;
-    return { i, vt, x: cx + R * Math.cos(ang), y: cy + R * Math.sin(ang) };
-  });
-  return (
-    <div className="hub-wrap">
-      <div className="hub-stage" style={{ "--c": c, "--c2": c2 }}>
-        <svg className="hub-lines" viewBox="0 0 360 360" aria-hidden="true">
-          {nodes.map((n) => (
-            <line
-              key={n.i}
-              x1={cx} y1={cy} x2={n.x} y2={n.y}
-              className={`spoke ${n.i === active ? "is-active" : ""}`}
-              style={n.i === active ? { stroke: c } : undefined}
-            />
-          ))}
-        </svg>
-        {nodes.map((n) => (
-          <button
-            key={n.vt.title}
-            type="button"
-            className={`node orbit-node ${n.i === active ? "is-active" : ""}`}
-            style={{ left: `${(n.x / 360) * 100}%`, top: `${(n.y / 360) * 100}%`, "--fc": HUB[n.i].c, "--d": `${n.i * 0.6}s` }}
-            onMouseEnter={() => setActive(n.i)}
-            onFocus={() => setActive(n.i)}
-            onClick={() => { setActive(n.i); onPick && onPick(n.i); }}
-            aria-label={`${n.vt.title} — view in Ventures`}
-          >
-            <VentureLogo venture={n.vt} className="node-logo" decorative variant="mark" />
-            <span className="node-name venture-label">{n.vt.title}</span>
-          </button>
-        ))}
-        <div className="hub-core">
-          <span className="hub-ring" />
-          <img src={logoMarkImg} alt="Quenchmark" className="hub-logo orbit-center-logo quenchmark-logo" />
-        </div>
-      </div>
-      <div className="hub-caption" key={active}>
-        <span className="hub-cat" style={{ color: c2 }}>{v.category}</span>
-        <strong className="hub-title">{v.title}</strong>
-        <span className="hub-desc">{v.highlights[0]}</span>
-      </div>
-    </div>
-  );
-}
+
+const values = [
+  { title: "Build to last", desc: "We engineer ventures for durability — real businesses, not vanity metrics." },
+  { title: "Ship with conviction", desc: "A bias to action. We move fast, decide clearly, and back ourselves." },
+  { title: "Honest by default", desc: "Transparency with partners, candor with our teams, trust with users." },
+  { title: "People over hype", desc: "Great teams build great companies — so we invest in people first." },
+];
 
 /* a titled numbered list that drops down / folds up via a toggle */
 function NumColumn({ kicker, title, items, variant }) {
   const [open, setOpen] = useState(false);
   const colRef = useRef(null);
-  // auto-fold when the column scrolls out of view
+  // auto-fold when the column scrolls out of view (only after it has been seen,
+  // so a column opened from the nav isn't closed before you arrive)
   useEffect(() => {
     const el = colRef.current;
     if (!el) return;
+    let seen = false;
     const io = new IntersectionObserver(
-      ([e]) => { if (!e.isIntersecting) setOpen(false); },
+      ([e]) => {
+        if (e.isIntersecting) seen = true;
+        else if (seen) setOpen(false);
+      },
       { threshold: 0 }
     );
     io.observe(el);
     return () => io.disconnect();
+  }, []);
+  // the nav's "Approach" link opens every column
+  useEffect(() => {
+    const openAll = () => setOpen(true);
+    window.addEventListener("qm:open-approach", openAll);
+    return () => window.removeEventListener("qm:open-approach", openAll);
   }, []);
   return (
     <Reveal className="m2-col" variant={variant}>
@@ -868,72 +598,90 @@ function NumColumn({ kicker, title, items, variant }) {
   );
 }
 
+/* ---------- ABOUT: a staged entrance — heading words rise, the highlight sweeps,
+   sector tags pop in, then the three principles are drawn in sequence ---------- */
+const ABOUT_SECTORS = ["Cybersecurity", "AI products", "Financial research", "Travel tech", "SaaS platforms", "Automation"];
+const ABOUT_PRINCIPLES = ["Create focused companies", "Operate with discipline", "Scale through systems"];
+function AboutSection() {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setInView(true), { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const lead = "A multi-venture company building practical".split(" ");
+  const mark = "digital businesses.".split(" ");
+  return (
+    <section ref={ref} className={`hs hs-cream about-anim ${inView ? "is-in" : ""}`} id="about" data-nav="sand">
+      <span className="about-orb" aria-hidden="true" />
+      <div className="about-premium">
+        <div className="about-premium-copy">
+          <span className="kicker">03 — About Quenchmark</span>
+          <h2 aria-label="A multi-venture company building practical digital businesses.">
+            {lead.map((w, i) => (
+              <Fragment key={i}><span className="aw" aria-hidden="true"><span style={{ "--i": i }}>{w}</span></span>{" "}</Fragment>
+            ))}
+            <span className="about-mark" aria-hidden="true">
+              {mark.map((w, i) => (
+                <Fragment key={w}><span className="aw"><span style={{ "--i": lead.length + i }}>{w}</span></span>{i < mark.length - 1 ? " " : ""}</Fragment>
+              ))}
+            </span>
+          </h2>
+          <p>
+            Quenchmark is a multi-venture company focused on creating, operating and scaling high-value digital businesses. We work across cybersecurity, AI-powered products, financial research, travel technology, SaaS platforms and automation-driven solutions.
+          </p>
+          {/* sectors scroll continuously left → right; the list is doubled for a seamless loop */}
+          <div className="about-marquee" aria-label="Sectors we work in">
+            <ul className="about-marquee-track">
+              {[0, 1].map((copy) =>
+                ABOUT_SECTORS.map((t) => (
+                  <li key={`${copy}-${t}`} aria-hidden={copy === 1}>{t}</li>
+                ))
+              )}
+            </ul>
+          </div>
+        </div>
+        <ol className="about-principles">
+          <span className="about-thread" aria-hidden="true" />
+          {ABOUT_PRINCIPLES.map((title, i) => (
+            <li className="principle" key={title} style={{ "--i": i }}>
+              <span className="principle-num" aria-hidden="true">
+                <span>{String(i + 1).padStart(2, "0")}</span>
+                <span>{String(i + 1).padStart(2, "0")}</span>
+              </span>
+              <span className="principle-text">
+                <strong>{title}</strong>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- HOME ---------- */
 function Home({ nav }) {
-  const [activeVent, setActiveVent] = useState(1);
-  const [ventPaused, setVentPaused] = useState(false);
-  useScrollZoom();
-  useEffect(() => {
-    if (ventPaused) return;
-    const id = setInterval(() => setActiveVent((i) => (i + 1) % ventures.length), 5000);
-    return () => clearInterval(id);
-  }, [ventPaused]);
   return (
     <>
       <HeroThree />
-      {/* HERO */}
-      <section className="hero" id="home" data-nav="creme">
-        <div className="hero-inner">
-          <div className="hero-main">
-            <span className="pill"><span className="pill-dot" />Quenchmark Venture Group</span>
-            <h1>
-              Powerful businesses, built <span className="hl">under one vision.</span>
-            </h1>
-            <p>
-              We turn ambitious ideas into businesses that last — building across
-              Travel, Cybersecurity &amp; AI&nbsp;Finance, all under one roof.
-            </p>
-            <div className="actions">
-              <button type="button" className="btn btn-solid" onClick={() => nav.section("ventures")}>Explore Ventures →</button>
-              <button type="button" className="btn btn-outline" onClick={() => nav.contact()}>Partner With Us</button>
-            </div>
-          </div>
+      {/* 00 — hero */}
+      <HomeHero nav={nav} />
 
-          <div className="hero-flow">
-            <HubStage
-              onPick={(i) => {
-                setVentPaused(true);
-                setActiveVent(i);
-                nav.section("ventures");
-              }}
-            />
-          </div>
-        </div>
-      </section>
+      {/* 01 — ventures: photo showcase; the full story lives on its own page */}
+      <VenturesTeaser onOpen={(chapter) => nav.open("ventures", chapter)} />
 
-      {/* ABOUT */}
-      <section className="band band-tint premium-section zoom-sec" id="about" data-nav="sand">
-        <div className="about-premium">
-          <Reveal className="about-premium-copy" variant="left">
-            <span className="kicker">About Quenchmark</span>
-            <h2>A multi-venture company building practical digital businesses.</h2>
-            <p>
-              Quenchmark is a multi-venture company focused on creating, operating and scaling high-value digital businesses. We work across cybersecurity, AI-powered products, financial research, travel technology, SaaS platforms and automation-driven solutions.
-            </p>
-          </Reveal>
-          <Reveal className="about-principles" delay={120}>
-            {["Create focused companies", "Operate with discipline", "Scale through systems"].map((item, i) => (
-              <div className="principle" key={item}>
-                <span>{String(i + 1).padStart(2, "0")}</span>
-                <strong>{item}</strong>
-              </div>
-            ))}
-          </Reveal>
-        </div>
-      </section>
+      {/* 02 — technologies: the product arm, with real product screens */}
+      <TechTeaser onOpen={(chapter) => nav.open("technologies", chapter)} />
+
+      {/* 03 — about + how we work */}
+      <AboutSection />
 
       {/* MISSION & HOW WE WORK */}
-      <section className="band band-mist zoom-sec" id="services" data-nav="pink">
+      <section className="band band-mist zoom-sec" id="approach" data-nav="pink">
         <div className="m2-grid">
           <NumColumn
             kicker="Our Mission"
@@ -950,120 +698,20 @@ function Home({ nav }) {
         </div>
       </section>
 
-      {/* VENTURES */}
-      <section className="band zoom-sec premium-section" id="ventures" data-nav="creme">
-        <Reveal className="section-head">
-          <span className="kicker">02 — Our Ecosystem</span>
-          <h2><SplitText text="From one group, many industries." /></h2>
-        </Reveal>
-        <Reveal variant="zoom">
-          <div
-            className="vent-showcase"
-            onMouseEnter={() => setVentPaused(true)}
-            onMouseLeave={() => setVentPaused(false)}
-          >
-            {/* every backdrop stays mounted and cross-fades — remounting on each
-                hover made the panel flash black while the next image loaded */}
-            {ventures.map((v, i) => (
-              <div
-                key={`bg-${v.title}`}
-                className={`vs-bg ${i === activeVent ? "is-active" : ""}`}
-                style={{ backgroundImage: `url(${v.image})` }}
-                aria-hidden="true"
-              />
-            ))}
-            {ventures.map((v, i) => (
-              <div
-                key={`tint-${v.title}`}
-                className={`vs-tint ${i === activeVent ? "is-active" : ""}`}
-                style={{ background: v.accent }}
-                aria-hidden="true"
-              />
-            ))}
-            {/* all four panels overlap in one grid cell, so the block is always
-                as tall as the longest venture — switching can't resize the
-                showcase or slide the nav around under the cursor */}
-            <div className="vs-left-stack">
-              {ventures.map((v, i) => (
-                <div
-                  className={`vs-left ${i === activeVent ? "is-active" : ""}`}
-                  key={v.title}
-                  aria-hidden={i !== activeVent}
-                  inert={i !== activeVent}
-                >
-                  <span className="vs-eyebrow">
-                    <VentureLogo venture={v} className="vs-eyebrow-logo" decorative variant="mark" />
-                    Our Ventures
-                  </span>
-                  {v.logo && (
-                    <div className="vs-brand-card showcase-logo-badge">
-                      <VentureLogo venture={v} className="vs-brand-logo" />
-                    </div>
-                  )}
-                  <h3 className="vs-title">{v.title}</h3>
-                  <p className="vs-desc">{v.desc}</p>
-                  <ul className="vb-highlights vs-highlights">
-                    {v.highlights.map((h) => (
-                      <li key={h}>{h}</li>
-                    ))}
-                  </ul>
-                  <div className="vb-facts vs-facts">
-                    {v.facts.map((f) => (
-                      <div className="vb-fact" key={f.label}>
-                        <span>{f.label}</span>
-                        <strong>{f.value}</strong>
-                      </div>
-                    ))}
-                  </div>
-                  <a className="vb-cta" href={v.link} target="_blank" rel="noopener noreferrer">
-                    Visit site →
-                  </a>
-                </div>
-              ))}
-            </div>
-            <ul className="vs-nav">
-              {ventures.map((v, i) => (
-                <li
-                  key={v.title}
-                  className={`vs-item ${i === activeVent ? "is-active" : ""}`}
-                  onMouseEnter={() => setActiveVent(i)}
-                  onClick={() => setActiveVent(i)}
-                >
-                  <span className="vs-num">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="vs-item-mark showcase-list-logo" aria-hidden="true">
-                    <VentureLogo venture={v} className="vs-item-logo" decorative variant="mark" />
-                  </span>
-                  <span className="vs-item-text">
-                    <span className="vs-item-name">{v.title}</span>
-                    <span className="vs-item-cat">{v.category}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* STATS */}
-      <section className="stats-band credibility-band zoom-sec" data-nav="creme">
-        <Reveal>
-          <p className="stats-eyebrow">Credibility</p>
-          <h2 className="stats-title">A focused venture group with a broad operating field.</h2>
-        </Reveal>
-        <Reveal className="stats-strip">
-          {stats.map((s) => (
-            <div className="stat" key={s.label}>
-              <span className="stat-val">
-                {s.text || <CountUp to={s.num} suffix={s.suffix} decimals={s.decimals || 0} />}
-              </span>
-              <span className="stat-lab">{s.label}</span>
-            </div>
-          ))}
-        </Reveal>
-      </section>
-
-      {/* STATEMENT */}
-      <section className="statement-band zoom-sec" data-nav="dark">
+      {/* statement */}
+      <section
+        className="statement-band"
+        data-nav="dark"
+        onMouseMove={(e) => {
+          const el = e.currentTarget;
+          const r = el.getBoundingClientRect();
+          el.style.setProperty("--sx", `${e.clientX - r.left}px`);
+          el.style.setProperty("--sy", `${e.clientY - r.top}px`);
+          el.style.setProperty("--so", "1");
+        }}
+        onMouseLeave={(e) => e.currentTarget.style.setProperty("--so", "0")}
+      >
+        <span className="statement-spot" aria-hidden="true" />
         <StatementThree />
         <Reveal>
           <h2 className="statement statement-shimmer">
@@ -1091,28 +739,8 @@ function Home({ nav }) {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="band cta-band zoom-sec" data-nav="creme">
-        <Reveal>
-          <div
-            className="cta"
-            onMouseMove={(e) => {
-              const el = e.currentTarget;
-              const r = el.getBoundingClientRect();
-              el.style.setProperty("--mx", (((e.clientX - r.left) / r.width) * 100).toFixed(1) + "%");
-              el.style.setProperty("--my", (((e.clientY - r.top) / r.height) * 100).toFixed(1) + "%");
-            }}
-          >
-            <span className="cta-spot" aria-hidden="true" />
-            <h2><SplitText text="Ready to scale your venture with Quenchmark?" /></h2>
-            <p>Partner with us to accelerate your vision. Let's build something lasting.</p>
-            <div className="actions">
-              <MagneticButton className="btn-light" onClick={() => nav.contact()}>Join Our Mission</MagneticButton>
-              <MagneticButton className="btn-outline-light" onClick={() => nav.contact()}>Contact Us</MagneticButton>
-            </div>
-          </div>
-        </Reveal>
-      </section>
+      {/* closing call to action */}
+      <ClosingCTA nav={nav} />
     </>
   );
 }
@@ -1258,7 +886,7 @@ function App() {
   // buttery momentum scrolling
   useEffect(() => {
     const lenis = new Lenis({
-      lerp: 0.085,          // frame-rate-independent smoothing — silkier than time-based
+      lerp: 0.13,           // follows the wheel closely: smooth, without the trailing "lag" feel
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
@@ -1277,7 +905,7 @@ function App() {
     };
   }, []);
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id, immediate = false) => {
     const lenis = lenisRef.current;
     if (id === "home") {
       if (lenis) lenis.scrollTo(0, { duration: 1.25 });
@@ -1286,21 +914,41 @@ function App() {
     }
     const el = document.getElementById(id);
     if (!el) return;
+    if (id === "approach") {
+      // open both "flow" dropdowns, and land the section's top under the navbar
+      window.dispatchEvent(new Event("qm:open-approach"));
+      // land just under the floating navbar; measured after the open state renders
+      requestAnimationFrame(() => {
+        const nav = document.querySelector(".nav-wrap");
+        const navH = nav ? nav.offsetHeight + 12 : 112;
+        const y = el.getBoundingClientRect().top + window.scrollY - navH;
+        if (lenis) lenis.scrollTo(y, immediate ? { immediate: true } : { duration: 1.2 });
+        else window.scrollTo({ top: y, behavior: "smooth" });
+      });
+      return;
+    }
     if (lenis) {
       // tall pinned sections align to their top; normal sections center
       const tall = el.clientHeight > window.innerHeight * 1.4;
       const offset = tall ? 2 : -(window.innerHeight - el.clientHeight) / 2;
-      lenis.scrollTo(el, { offset, duration: 1.35 });
+      lenis.scrollTo(el, immediate ? { offset, immediate: true } : { offset, duration: 1.35 });
     } else {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
   useEffect(() => {
-    if (page === "home" && pendingSection) {
-      scrollToSection(pendingSection);
+    if (pendingSection) {
+      // wait a frame so Lenis has measured the freshly rendered page
+      const id = pendingSection;
       setPendingSection(null);
-    } else if (!pendingSection) {
+      if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true });
+      requestAnimationFrame(() => {
+        if (lenisRef.current) lenisRef.current.resize();
+        // jumping deep into a full page lands instantly; home keeps its glide
+        scrollToSection(id, page !== "home");
+      });
+    } else {
       if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true });
       else window.scrollTo({ top: 0, behavior: "auto" });
     }
@@ -1316,9 +964,25 @@ function App() {
         setPage("home");
       }
     },
+    /* open a full page (ventures / technologies), optionally at a chapter */
+    open: (target, anchor) => {
+      if (target === page) {
+        if (anchor) scrollToSection(anchor);
+        else scrollToSection("home");
+      } else {
+        setPendingSection(anchor || null);
+        setPage(target);
+      }
+    },
+    scrollToId: (id) => scrollToSection(id),
+    scrollToY: (y) => {
+      if (lenisRef.current) lenisRef.current.scrollTo(y, { duration: 1.1 });
+      else window.scrollTo({ top: y, behavior: "smooth" });
+    },
     contact: () => setPage("contact"),
     careers: () => setPage("careers"),
   };
+  const fullPage = page === "home" || page === "ventures" || page === "technologies";
 
   return (
     <>
@@ -1338,12 +1002,14 @@ function App() {
           </h1>
         </div>
       )}
-      <div className={`page ${page !== "home" ? "page-locked" : ""} ${intro === "typing" ? "page-hidden" : "revealed"}`}>
+      <div className={`page ${fullPage ? "" : "page-locked"} ${intro === "typing" ? "page-hidden" : "revealed"}`}>
         <Navbar nav={nav} page={page} />
         {page === "home" && <Home nav={nav} />}
+        {page === "ventures" && <VenturesPage nav={nav} />}
+        {page === "technologies" && <TechnologiesPage nav={nav} />}
         {page === "contact" && <ContactPage />}
         {page === "careers" && <CareersPage nav={nav} />}
-        {page === "home" ? <Footer nav={nav} /> : <MiniFooter />}
+        {fullPage ? <Footer nav={nav} /> : <MiniFooter />}
       </div>
     </>
   );
