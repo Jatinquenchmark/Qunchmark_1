@@ -1,0 +1,57 @@
+/* ==========================================================================
+   Shared colour + motion layer for the Technologies and Ventures pages
+   ========================================================================== */
+
+/* ---- aurora: drifting colour light ---- */
+.fx-aurora { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.fx-aurora i {
+  position: absolute;
+  width: 46vmax;
+  height: 46vmax;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.42;
+  will-change: transform;
+}
+.fx-aurora i:nth-child(1) { left: -12%; top: -18%; background: var(--fa); animation: fxDrift1 22s ease-in-out infinite alternate; }
+.fx-aurora i:nth-child(2) { right: -14%; top: 10%; background: var(--fb); animation: fxDrift2 26s ease-in-out infinite alternate; }
+.fx-aurora i:nth-child(3) { left: 28%; bottom: -30%; background: var(--fc); opacity: 0.3; animation: fxDrift3 30s ease-in-out infinite alternate; }
+@keyframes fxDrift1 { to { transform: translate3d(18%, 22%, 0) scale(1.15); } }
+@keyframes fxDrift2 { to { transform: translate3d(-22%, 14%, 0) scale(0.9); } }
+@keyframes fxDrift3 { to { transform: translate3d(14%, -18%, 0) scale(1.2); } }
+.fx-aurora.is-soft i { opacity: 0.24; }
+.fx-aurora.is-soft i:nth-child(3) { opacity: 0.16; }
+
+/* ---- animated gradient text ---- */
+.fx-gradient-text {
+  background: linear-gradient(90deg, #a78bfa, #f472b6, #fb923c, #22d3ee, #818cf8, #a78bfa);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fxShift 9s linear infinite;
+}
+@keyframes fxShift { to { background-position: 300% 0; } }
+
+/* ---- live border: a light that runs around the card edge ---- */
+@property --fx-ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.fx-border { position: relative; isolation: isolate; }
+.fx-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--fx-ang), transparent 0deg, var(--fx-c, #818cf8) 50deg, transparent 110deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: fxSpin 4.5s linear infinite;
+  pointer-events: none;
+}
+@keyframes fxSpin { to { --fx-ang: 360deg; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-aurora i, .fx-gradient-text, .fx-border::before { animation: none; }
+}

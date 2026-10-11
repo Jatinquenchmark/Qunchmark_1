@@ -1,26 +1,31 @@
 :root {
-  /* Light theme: near-white surfaces, depth from shadow, one warm highlight */
+  /* Light theme: cool neutral surfaces, depth from shadow, one electric-indigo accent */
+  --acc: #4f46e5;           /* the single accent */
+  --acc-2: #6366f1;
+  --acc-light: #818cf8;     /* accent on dark surfaces */
+  --acc-rgb: 79, 70, 229;
+
   --creme: #ffffff;
-  --sand: #f4f3f1;
-  --pink: #efece9;
-  --espresso: #1c1a18;
+  --sand: #f4f5f7;
+  --pink: #eff1f4;
+  --espresso: #0f1115;
 
   --bg: #ffffff;            /* page base — white */
-  --bg-tint: #f7f6f4;       /* faintest warm-grey band */
-  --bg-mist: #f3f1ee;       /* slightly deeper light band */
+  --bg-tint: #f6f7f9;       /* faintest cool-grey band */
+  --bg-mist: #f1f3f6;       /* slightly deeper light band */
   --surface: #ffffff;       /* card surface */
-  --ink: #1f1c19;           /* near-black text */
-  --ink-soft: #77716a;      /* muted grey text */
-  --accent: #221f1c;        /* near-black — primary actions */
-  --accent-deep: #0f0d0b;   /* deepest near-black */
-  --accent-rose: #b07a55;   /* the single warm highlight accent */
-  --accent-tint: #f1ece7;   /* faint warm wash for badges/icons */
-  --gold: #c08a4a;          /* warm highlight for numerals/stars */
-  --line: rgba(20, 16, 12, 0.09);
-  --footer-text: #2a2723;
-  --footer-muted: #8a847d;
-  --shadow-sm: 0 4px 18px rgba(20, 16, 12, 0.05);
-  --shadow-md: 0 24px 60px -30px rgba(20, 16, 12, 0.20);
+  --ink: #0f1115;           /* near-black text */
+  --ink-soft: #5f6672;      /* muted grey text */
+  --accent: #0f1115;        /* near-black — primary actions */
+  --accent-deep: #0b0c0f;   /* deepest near-black */
+  --accent-rose: var(--acc);   /* the accent (name kept for existing rules) */
+  --accent-tint: #eef0ff;   /* faint accent wash for badges/icons */
+  --gold: var(--acc-2);     /* highlight for numerals */
+  --line: rgba(15, 17, 21, 0.09);
+  --footer-text: #1f2329;
+  --footer-muted: #8a909b;
+  --shadow-sm: 0 4px 18px rgba(15, 17, 21, 0.05);
+  --shadow-md: 0 24px 60px -30px rgba(15, 17, 21, 0.20);
 
   --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
