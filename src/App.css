@@ -2260,7 +2260,7 @@
 }
 
 /* ============ SUBPAGES (full-screen, no-scroll) ============ */
-/* lock the whole viewport for contact/careers so nothing scrolls */
+/* lock the whole viewport for the contact page so nothing scrolls */
 .page-locked {
   height: 100dvh;
   overflow: hidden;
@@ -2362,129 +2362,14 @@ section[id] {
 .form-success h3 { font-family: var(--font-serif); font-size: 1.9rem; font-weight: 600; margin-bottom: 0.6rem; }
 .form-success p { color: var(--ink-soft); }
 
-/* careers */
-.careers-inner { text-align: center; }
-/* type scales with height as well as width, so short screens compress
-   instead of pushing the roles list off the bottom */
-.careers-inner > div > h2,
-.careers-inner h2 {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: clamp(1.5rem, min(4.4vw, 5vh), 3.2rem);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
-  margin-top: clamp(0.15rem, 0.6vh, 0.45rem);
-}
-.careers-sub {
-  color: var(--ink-soft);
-  font-size: clamp(0.84rem, 1.6vh, 1.08rem);
-  margin-top: clamp(0.3rem, 1.1vh, 0.9rem);
-}
-.positions-head {
-  max-width: 940px;
-  margin: clamp(0.6rem, 2.3vh, 2.2rem) auto clamp(0.3rem, 0.9vh, 0.85rem);
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  text-align: left;
-}
-.positions-count {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.positions-note { font-size: 0.82rem; color: var(--ink-soft); }
-
-/* one panel, hairline-separated rows — every column lines up across roles */
-.positions {
-  max-width: 940px;
-  margin: 0 auto;
-  text-align: left;
-  background: linear-gradient(165deg, #ffffff, var(--surface));
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  overflow: hidden;
-}
-.position-row + .position-row .position { border-top: 1px solid var(--line); }
-.position {
-  display: grid;
-  grid-template-columns: 168px minmax(0, 1fr) 190px auto;
-  align-items: center;
-  gap: 1.2rem;
-  padding: clamp(0.34rem, 1.5vh, 1.2rem) 1.6rem;
-  transition: background 0.25s ease;
-}
-.position:hover { background: rgba(var(--acc-rgb), 0.07); }
-.position-dept {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent-rose);
-}
-.position-title {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 1.18rem;
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-.position-type { font-size: 0.84rem; color: var(--ink-soft); }
-.position-apply {
-  justify-self: end;
-  padding: 0.55rem 1.15rem;
-  font-size: 0.86rem;
-  opacity: 0.9;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-.position:hover .position-apply { opacity: 1; transform: translateX(2px); }
-
-/* careers stays on one screen. The navbar is sticky and already in flow, so no
-   top padding is needed to clear it — everything sits high and scales with
-   viewport height so the list still fits on short laptops without scrolling. */
-.screen:has(.careers-inner) {
-  align-items: flex-start;
-  padding-top: clamp(0.4rem, 1.8vh, 2rem);
-  padding-bottom: clamp(0.5rem, 1.8vh, 2rem);
-}
-.careers-cta {
-  max-width: 940px;
-  margin: clamp(0.55rem, 2vh, 1.5rem) auto 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  text-align: left;
-}
-.careers-cta-text { font-size: 0.92rem; color: var(--ink-soft); }
-.careers-cta-btn {
-  flex-shrink: 0;
-  padding: 0.58rem 1.2rem;
-  font-size: 0.87rem;
-  white-space: nowrap;
-}
-
-/* short viewports: shrink the row type too, so five roles always fit */
-@media (max-height: 780px) {
-  .position-title { font-size: 1.05rem; }
-  .careers-cta-text { font-size: 0.86rem; }
-  .careers-cta-btn { padding: 0.48rem 1rem; font-size: 0.83rem; }
-}
-@media (max-height: 700px) {
-  .position-title { font-size: 0.99rem; }
-  .position-apply { padding: 0.45rem 1rem; font-size: 0.82rem; }
-}
-/* very short windows: compact table-style rows so five roles still fit */
-@media (max-height: 620px) {
-  .position { padding: 0.3rem 1.5rem; }
-  .position-title { font-size: 0.94rem; }
-  .position-dept { font-size: 0.62rem; }
-  .position-type { font-size: 0.78rem; }
-  .position-apply { padding: 0.38rem 0.9rem; font-size: 0.78rem; }
-}
+/* contact page extras */
+.contact-points a { color: inherit; border-bottom: 1px solid var(--line); transition: color 0.2s, border-color 0.2s; }
+.contact-points a:hover { color: var(--accent-rose); border-color: var(--accent-rose); }
+.contact-link { background: none; padding: 0; font: inherit; font-weight: 600; color: var(--accent-rose); }
+.contact-link:hover { text-decoration: underline; }
+.contact-error { font-size: 0.86rem; color: #dc2626; margin: 0; }
+:root[data-theme="dark"] .contact-error { color: #f87171; }
+.form-submit:disabled { opacity: 0.75; cursor: progress; transform: none; }
 
 /* thank-you popup */
 .modal-overlay {
@@ -2589,16 +2474,6 @@ section[id] {
   .nav-mobile-only { display: block; }
   .footer-top { grid-template-columns: 1fr 1fr; }
   .grid-services { grid-template-columns: 1fr; }
-  /* stack the row into a card, keeping Apply on its own line */
-  .position {
-    grid-template-columns: 1fr;
-    align-items: flex-start;
-    gap: 0.35rem;
-    padding: 1.15rem 1.25rem;
-  }
-  .position-apply { justify-self: stretch; margin-top: 0.85rem; }
-  .positions-head { flex-direction: column; gap: 0.25rem; align-items: flex-start; }
-  .careers-cta { flex-direction: column; align-items: stretch; gap: 0.75rem; text-align: center; }
   .page-locked { height: auto; overflow: visible; display: block; }
   .page-locked .screen { flex: none; }
   .screen { min-height: auto; padding: 3rem 6vw; }

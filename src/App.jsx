@@ -6,16 +6,53 @@ import { ventures, products } from "./brands";
 import { TechnologiesPage, HomeHero, VenturesTeaser } from "./Showcase";
 import { VenturesPage } from "./VenturesPage";
 import { TechTeaser, ClosingCTA } from "./HomeSections";
+import { ReachUsPage } from "./ReachUs";
+import { validateEnquiry, GENERAL_ENQUIRY, PUBLIC_EMAIL } from "./lib/enquiry";
 
 const logoImg = "/quenchmark-logo.png";
 
-const positions = [
-  { title: "HR & Operations", dept: "People", type: "Full-time" },
-  { title: "Graphic Designer", dept: "Design", type: "Full-time" },
-  { title: "Web Developer", dept: "Engineering", type: "Full-time" },
-  { title: "AI Research", dept: "Research", type: "Full-time" },
-  { title: "SEO & Content Writing", dept: "Marketing", type: "Full-time" },
-];
+/* each page has a real URL so refreshes, direct links and back/forward work.
+   Old URLs (e.g. /careers) are mapped to their replacement. */
+const ROUTES = {
+  home: {
+    path: "/",
+    title: "Quenchmark",
+    description: "Quenchmark is a venture group building focused digital businesses across technology, finance, cybersecurity, travel, SaaS and automation.",
+  },
+  ventures: {
+    path: "/ventures",
+    title: "Ventures | Quenchmark",
+    description: "Explore the Quenchmark ventures — focused digital businesses across cybersecurity, travel, finance and automation.",
+  },
+  technologies: {
+    path: "/technologies",
+    title: "Technologies | Quenchmark",
+    description: "The Quenchmark product arm — SaaS platforms and AI-powered tools built and operated in-house.",
+  },
+  contact: {
+    path: "/contact",
+    title: "Contact | Quenchmark",
+    description: "Get in touch with Quenchmark. Email official@quenchmark.org — we respond within 24 hours.",
+  },
+  "reach-us": {
+    path: "/reach-us",
+    title: "Reach Us – Website, App, AI & Software Development | Quenchmark",
+    description: "Tell us about your project. QuenchMark builds websites, mobile apps, custom software, AI automation, UI/UX design and digital marketing for growing businesses.",
+  },
+};
+const LEGACY_PATHS = { "/careers": "reach-us" };
+
+function pageFromPath(pathname) {
+  const path = pathname.replace(/\/+$/, "") || "/";
+  if (LEGACY_PATHS[path]) return LEGACY_PATHS[path];
+  const hit = Object.entries(ROUTES).find(([, r]) => r.path === path);
+  return hit ? hit[0] : "home";
+}
+
+function setMeta(selector, attr, value) {
+  const el = document.head.querySelector(selector);
+  if (el) el.setAttribute(attr, value);
+}
 
 /* reveal-on-scroll wrapper */
 function Reveal({ children, className = "", delay = 0, variant = "up" }) {
@@ -444,7 +481,7 @@ function Navbar({ nav, page }) {
           </span>
         </button>
 
-        <ul className={`nav-links ${menuOpen ? "open" : ""}`}>
+        <ul className={`nav-links ${menuOpen ? "open" : ""}`} id="primary-nav">
           {links.map(([label, id, kind]) => (
             <li key={id}>
               <button
@@ -457,15 +494,15 @@ function Navbar({ nav, page }) {
             </li>
           ))}
           <li><button type="button" onClick={() => { nav.contact(); close(); }}>Contact</button></li>
-          <li className="nav-mobile-only"><button type="button" onClick={() => { nav.careers(); close(); }}>Careers</button></li>
+          <li className="nav-mobile-only"><button type="button" className={page === "reach-us" ? "is-current" : ""} onClick={() => { nav.reachUs(); close(); }}>Reach Us</button></li>
         </ul>
 
         <div className="nav-right">
           <ThemeToggle />
-          <button className="btn btn-solid nav-cta" onClick={() => nav.careers()}>Careers</button>
+          <button className="btn btn-solid nav-cta" aria-current={page === "reach-us" ? "page" : undefined} onClick={() => nav.reachUs()}>Reach Us</button>
         </div>
 
-        <button className={`burger ${menuOpen ? "open" : ""}`} aria-label="Menu" onClick={() => setMenuOpen((v) => !v)}>
+        <button className={`burger ${menuOpen ? "open" : ""}`} aria-label="Menu" aria-expanded={menuOpen} aria-controls="primary-nav" onClick={() => setMenuOpen((v) => !v)}>
           <span></span><span></span><span></span>
         </button>
       </nav>
@@ -513,7 +550,7 @@ function Footer({ nav }) {
           <h4>Company</h4>
           <button type="button" onClick={() => nav.section("about")}>About</button>
           <button type="button" onClick={() => nav.contact()}>Contact</button>
-          <button type="button" onClick={() => nav.careers()}>Careers</button>
+          <button type="button" onClick={() => nav.reachUs()}>Reach Us</button>
           <a href="mailto:official@quenchmark.org">Email Us</a>
         </div>
       </div>
@@ -759,12 +796,49 @@ function MiniFooter() {
 }
 
 /* ---------- CONTACT PAGE ---------- */
-function ContactPage() {
+/* a short general-enquiry form; posts to the same /api/enquiry endpoint as Reach Us */
+function ContactPage({ nav }) {
   const [showThanks, setShowThanks] = useState(false);
-  const handleSubmit = (e) => {
+  const [status, setStatus] = useState("idle"); // idle | sending | error
+  const [message, setMessage] = useState("");
+  const startedAt = useRef(0); // when the form appeared (spam time-trap)
+  useEffect(() => { startedAt.current = Date.now(); }, []);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    e.target.reset();
-    setShowThanks(true);
+    if (status === "sending") return;
+    const form = e.target;
+    const f = new FormData(form);
+    const payload = {
+      name: f.get("name"),
+      email: f.get("email"),
+      phone: f.get("phone"),
+      company: f.get("company"),
+      description: f.get("message"),
+      service: GENERAL_ENQUIRY,
+      contactMethod: "Email",
+      website: f.get("website"),
+      elapsedMs: Date.now() - startedAt.current,
+    };
+    const { errors } = validateEnquiry(payload);
+    const first = Object.values(errors)[0];
+    if (first) { setMessage(first); setStatus("error"); return; }
+    setStatus("sending");
+    setMessage("");
+    try {
+      const r = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await r.json().catch(() => ({}));
+      if (!r.ok || !json.ok) throw new Error(json.error || `Something went wrong. Please email us at ${PUBLIC_EMAIL}.`);
+      form.reset();
+      setStatus("idle");
+      setShowThanks(true);
+    } catch (err) {
+      setMessage(err.message && !/fetch/i.test(err.message) ? err.message : `We couldn't reach our server. Please try again or email us at ${PUBLIC_EMAIL}.`);
+      setStatus("error");
+    }
   };
   return (
     <main className="screen" data-nav="creme">
@@ -778,35 +852,43 @@ function ContactPage() {
             Ready to scale your venture with Quenchmark? Connect with Us Today.
           </p>
           <ul className="contact-points">
-            <li><span>Email</span>official@quenchmark.org</li>
+            <li><span>Email</span><a href={`mailto:${PUBLIC_EMAIL}`}>{PUBLIC_EMAIL}</a></li>
             <li><span>Based in</span>India 🇮🇳</li>
             <li><span>Response</span>Within 24 hours</li>
+            <li><span>Projects</span><button type="button" className="contact-link" onClick={() => nav.reachUs()}>Start a project enquiry →</button></li>
           </ul>
         </Reveal>
 
         <Reveal className="contact-card" delay={120}>
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form className="contact-form" onSubmit={handleSubmit} noValidate aria-busy={status === "sending"}>
             <div className="field">
-              <label>Full Name <span>*</span></label>
-              <input type="text" required placeholder="Your full name" />
+              <label htmlFor="ct-name">Full Name <span>*</span></label>
+              <input id="ct-name" name="name" type="text" autoComplete="name" required placeholder="Your full name" />
             </div>
             <div className="field">
-              <label>Email Address <span>*</span></label>
-              <input type="email" required placeholder="you@example.com" />
+              <label htmlFor="ct-email">Email Address <span>*</span></label>
+              <input id="ct-email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" />
             </div>
             <div className="field">
-              <label>Phone Number <span>*</span></label>
-              <input type="tel" required placeholder="+91 98765 43210" />
+              <label htmlFor="ct-phone">Phone Number <span>*</span></label>
+              <input id="ct-phone" name="phone" type="tel" autoComplete="tel" required placeholder="+91 98765 43210" />
             </div>
             <div className="field">
-              <label>Company <em>(Optional)</em></label>
-              <input type="text" placeholder="Company name" />
+              <label htmlFor="ct-company">Company <em>(Optional)</em></label>
+              <input id="ct-company" name="company" type="text" autoComplete="organization" placeholder="Company name" />
             </div>
             <div className="field field-full">
-              <label>Your Message <span>*</span></label>
-              <textarea required rows="3" placeholder="Tell us a bit about what you're looking for..."></textarea>
+              <label htmlFor="ct-message">Your Message <span>*</span></label>
+              <textarea id="ct-message" name="message" required rows="3" placeholder="Tell us a bit about what you're looking for..."></textarea>
             </div>
-            <button type="submit" className="btn btn-solid form-submit">Submit →</button>
+            <div className="ru-hp" aria-hidden="true">
+              <label htmlFor="ct-website">Website</label>
+              <input id="ct-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+            </div>
+            {status === "error" && <p className="contact-error field-full" role="alert">{message}</p>}
+            <button type="submit" className="btn btn-solid form-submit" disabled={status === "sending"}>
+              {status === "sending" ? "Sending…" : "Submit →"}
+            </button>
           </form>
         </Reveal>
       </div>
@@ -830,55 +912,9 @@ function ContactPage() {
   );
 }
 
-/* ---------- CAREERS PAGE ---------- */
-function CareersPage({ nav }) {
-  return (
-    <main className="screen" data-nav="creme">
-      <div className="aurora" />
-      <div className="hero-grain" />
-      <div className="screen-inner careers-inner">
-        <Reveal>
-          <span className="kicker">Careers · We're Hiring</span>
-          <h2>Build the future <span className="hl">with us.</span></h2>
-          <p className="careers-sub">Curious, driven people wanted across these open roles.</p>
-        </Reveal>
-        <Reveal className="positions-head" delay={60}>
-          <span className="positions-count">{positions.length} open roles</span>
-          <span className="positions-note">All roles are remote-friendly</span>
-        </Reveal>
-        <div className="positions">
-          {positions.map((p, i) => (
-            <Reveal key={p.title} delay={120 + i * 60} className="position-row">
-              <div className="position">
-                <span className="position-dept">{p.dept}</span>
-                <h3 className="position-title">{p.title}</h3>
-                <span className="position-type">{p.type}</span>
-                <button
-                  className="btn btn-solid position-apply"
-                  onClick={() => window.open("https://forms.gle/HAvVvmagcmJvxzn88", "_blank", "noopener,noreferrer")}
-                >
-                  Apply →
-                </button>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal className="careers-cta" delay={140 + positions.length * 60}>
-          <span className="careers-cta-text">
-            Don&apos;t see a role that fits? We&apos;d still like to hear from you.
-          </span>
-          <button type="button" className="btn btn-outline careers-cta-btn" onClick={() => nav.contact()}>
-            Contact us for more info →
-          </button>
-        </Reveal>
-      </div>
-    </main>
-  );
-}
-
 /* ---------- APP (lightweight page switcher) ---------- */
 function App() {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() => pageFromPath(window.location.pathname));
   const [pendingSection, setPendingSection] = useState(null);
   const [intro, setIntro] = useState("typing"); // typing -> moving -> done
   const lenisRef = useRef(null);
@@ -955,6 +991,32 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
+  // keep the URL, title and description in step with the page
+  useEffect(() => {
+    const route = ROUTES[page] || ROUTES.home;
+    if (window.location.pathname !== route.path) {
+      const legacy = LEGACY_PATHS[window.location.pathname.replace(/\/+$/, "")];
+      // an old URL (e.g. /careers) is replaced, not stacked in history
+      window.history[legacy ? "replaceState" : "pushState"]({ page }, "", route.path + window.location.hash);
+    }
+    document.title = route.title;
+    const url = `https://quenchmark.org${route.path === "/" ? "/" : route.path}`;
+    setMeta('meta[name="description"]', "content", route.description);
+    setMeta('link[rel="canonical"]', "href", url);
+    setMeta('meta[property="og:url"]', "content", url);
+    setMeta('meta[property="og:title"]', "content", route.title);
+    setMeta('meta[property="og:description"]', "content", route.description);
+    setMeta('meta[name="twitter:title"]', "content", route.title);
+    setMeta('meta[name="twitter:description"]', "content", route.description);
+  }, [page]);
+
+  // browser back / forward
+  useEffect(() => {
+    const onPop = () => setPage(pageFromPath(window.location.pathname));
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   const nav = {
     section: (id) => {
       if (page === "home") {
@@ -980,9 +1042,9 @@ function App() {
       else window.scrollTo({ top: y, behavior: "smooth" });
     },
     contact: () => setPage("contact"),
-    careers: () => setPage("careers"),
+    reachUs: () => (page === "reach-us" ? scrollToSection("home") : setPage("reach-us")),
   };
-  const fullPage = page === "home" || page === "ventures" || page === "technologies";
+  const fullPage = page === "home" || page === "ventures" || page === "technologies" || page === "reach-us";
 
   return (
     <>
@@ -1007,8 +1069,8 @@ function App() {
         {page === "home" && <Home nav={nav} />}
         {page === "ventures" && <VenturesPage nav={nav} />}
         {page === "technologies" && <TechnologiesPage nav={nav} />}
-        {page === "contact" && <ContactPage />}
-        {page === "careers" && <CareersPage nav={nav} />}
+        {page === "contact" && <ContactPage nav={nav} />}
+        {page === "reach-us" && <ReachUsPage nav={nav} />}
         {fullPage ? <Footer nav={nav} /> : <MiniFooter />}
       </div>
     </>

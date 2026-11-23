@@ -189,7 +189,7 @@ export function ClosingCTA({ nav }) {
         <div className="cx-side">
           <div className="cx-actions">
             <button type="button" className="hs-btn hs-btn-light" onClick={nav.contact}>Partner with us <Arrow d={RIGHT} /></button>
-            <button type="button" className="hs-btn hs-btn-ghost-light" onClick={nav.careers}>Join the team</button>
+            <button type="button" className="hs-btn hs-btn-ghost-light" onClick={nav.reachUs}>Start a project</button>
           </div>
           <a className="cx-mail" href="mailto:official@quenchmark.org">official@quenchmark.org</a>
         </div>

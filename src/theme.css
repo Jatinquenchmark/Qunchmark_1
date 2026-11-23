@@ -149,7 +149,7 @@ html.theme-anim * {
 /* footer */
 :root[data-theme="dark"] .footer { background: #0a0b0e; }
 
-/* ---------------- contact / careers ---------------- */
+/* ---------------- contact ---------------- */
 :root[data-theme="dark"] .field input,
 :root[data-theme="dark"] .field textarea { background: #13151b; }
 :root[data-theme="dark"] .field input::placeholder,
@@ -158,8 +158,7 @@ html.theme-anim * {
 
 
 
-/* contact + careers panels */
-:root[data-theme="dark"] .positions,
+/* contact panel */
 :root[data-theme="dark"] .contact-form { background: linear-gradient(165deg, #161922, #111318); }
 :root[data-theme="dark"] .aurora {
   background:
