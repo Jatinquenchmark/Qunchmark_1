@@ -23,6 +23,10 @@ export const ENGAGEMENT_MODELS = [
 
 /* in-house builds we can genuinely point to (keys match src/brands.js) */
 export const WORK = {
+  deep: { title: "Deep Real Estate", type: "Client project · Website", desc: "Website for a Gurugram real estate brokerage: property listings, master-plan maps library and local infrastructure updates.", href: "/work#deep-real-estate" },
+  mytix: { title: "Mytix", type: "Client project · Website", desc: "Product website for an Australian live-event ticketing platform with iPhone and Android apps.", href: "/work#mytix" },
+  skytrips: { title: "My Sky Trips", type: "Client project · Website", desc: "Travel website for helicopter tours and spiritual journeys in India, with package catalogue and enquiries.", href: "/work#my-sky-trips" },
+  menopause: { title: "Menopause India", type: "Client project · Website", desc: "Health-education website with podcast episodes and long-form articles for Indian women aged 35+.", href: "/work#menopause-india" },
   brokr: { title: "BrokrSuite", type: "In-house SaaS product", desc: "Real estate CRM for brokers and agencies — properties, leads, clients, follow-ups and team management, with iPhone and Android apps.", href: "/brokrsuite" },
   dmg: { title: "DMGennie", type: "In-house SaaS product", desc: "Instagram automation that sends a DM when someone comments a keyword, built on the official Meta API.", href: "/technologies" },
   qm: { title: "QuantMentor", type: "In-house product (beta)", desc: "AI tool that turns trading rules written in plain English into Pine Script that traders can backtest.", href: "/technologies" },
@@ -124,7 +128,7 @@ export const SERVICES = [
       "A company adding a client login area for documents, invoices and updates",
     ],
     tech: ["React", "Next.js", "Vite", "Node.js", "Headless CMS", "Shopify / custom e-commerce", "Vercel", "Tailwind CSS"],
-    work: ["tripsoul", "parameterx", "brokr"],
+    work: ["deep", "mytix", "skytrips", "menopause"],
     related: ["ui-ux-design", "saas-development", "software-maintenance", "business-automation"],
     faqs: [
       { q: "How much does a business website cost?", a: "A focused business website costs far less than a web application with accounts, payments and integrations. We'll recommend the simplest build that meets your goals and give you a fixed written estimate after the consultation." },
@@ -280,7 +284,7 @@ export const SERVICES = [
       "Creating a design system for a product with several teams",
     ],
     tech: ["Figma", "Design systems", "Prototyping", "Usability testing", "Accessibility (WCAG)"],
-    work: ["brokr", "dmg", "tripsoul"],
+    work: ["mytix", "menopause", "skytrips", "brokr"],
     related: ["web-development", "mobile-app-development", "saas-development"],
     faqs: [
       { q: "Do you only design, or also build?", a: "Both. We can design only, or design and develop together so the product that ships matches the design." },
@@ -588,7 +592,7 @@ export const SERVICES = [
       "Gradually modernising an older system while it stays in use",
     ],
     tech: ["React", "Node.js", "PHP", "Python", "Android & iOS", "Cloud hosting", "Monitoring & error tracking"],
-    work: ["brokr", "dmg", "tripsoul"],
+    work: ["brokr", "dmg", "deep"],
     related: ["cloud-devops", "software-development", "web-development"],
     faqs: [
       { q: "Can you maintain software built by someone else?", a: "Yes. We start with a review of the code, hosting and documentation, then agree a maintenance plan." },

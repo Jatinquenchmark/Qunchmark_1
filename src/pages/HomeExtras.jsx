@@ -2,6 +2,7 @@ import { SERVICES } from "../content/services.js";
 import { INDUSTRIES } from "../content/industries.js";
 import { BROKRSUITE, BROKR_FEATURES } from "../content/brokrsuite.js";
 import { HOME_FAQS } from "../site/routes.js";
+import { CLIENT_PROJECTS } from "../content/work.js";
 import { Link } from "../site/nav.jsx";
 import { Section, Faq, WhatsAppCta, Rise, ArrowRight, Check } from "./common.jsx";
 import { ServiceCards, ProcessSteps } from "./Services.jsx";
@@ -22,13 +23,36 @@ export function ServicesOverview() {
   );
 }
 
+export function ClientWork() {
+  return (
+    <Section id="client-work" kicker="02 — Client work" title={<>Websites we&apos;ve built <em>for our clients.</em></>} lead="Real estate in Gurugram, live-event ticketing in Australia, helicopter travel and women's health — designed and developed by our team." tone="tint">
+      <div className="hm-clients">
+        {CLIENT_PROJECTS.map((c) => (
+          <Link key={c.id} to={`/work#${c.id}`} className="hm-client" data-cta={`home-client:${c.id}`}>
+            <img src={c.shot} alt={`${c.name} website (${c.domain})`} width="1440" height="900" loading="lazy" decoding="async" />
+            <span className="hm-client-body">
+              <b>{c.name}</b>
+              <em>{c.industry} · {c.location}</em>
+              <p>{c.short}</p>
+              <span className="pg-link">View case study <ArrowRight /></span>
+            </span>
+          </Link>
+        ))}
+      </div>
+      <div className="hm-more">
+        <Link className="pg-btn pg-btn-ghost" to="/work">See all our work <ArrowRight /></Link>
+      </div>
+    </Section>
+  );
+}
+
 export function BrokrHome() {
   const highlights = BROKR_FEATURES.filter((f) => ["clients", "team", "properties", "listings"].includes(f.id));
   return (
     <section className="pg-sec hm-brokr" id="brokrsuite" data-nav="dark">
       <div className="pg-inner hm-brokr-grid">
         <Rise className="hm-brokr-copy">
-          <span className="hs-kicker">02 — Our product · BrokrSuite</span>
+          <span className="hs-kicker">03 — Our product · BrokrSuite</span>
           <h2>Your entire real estate business. <em>One powerful platform.</em></h2>
           <p>BrokrSuite is our real estate CRM and business management platform. Brokers, property dealers and agencies use it to manage their team, clients, follow-ups and property inventory — and publish listings — from one app on iPhone and Android.</p>
           <ul className="hm-brokr-list">
@@ -58,7 +82,7 @@ export function HomeProcess() {
 
 export function IndustriesStrip() {
   return (
-    <Section kicker="04 — Industries" title={<>Solutions for <em>your industry.</em></>} lead="From real estate — where we run our own product — to healthcare, education, retail, logistics and more." tone="tint">
+    <Section kicker="05 — Industries" title={<>Solutions for <em>your industry.</em></>} lead="From real estate — where we've built client websites and run our own product — to healthcare, travel, education, retail, logistics and more." tone="tint">
       <ul className="hm-industries">
         {INDUSTRIES.map((i) => (
           <li key={i.id}><Link to={`/industries#${i.id}`}>{i.name} <ArrowRight /></Link></li>
@@ -69,7 +93,7 @@ export function IndustriesStrip() {
 }
 
 const WHY = [
-  { title: "We build our own products", desc: "We design, launch and run SaaS products like BrokrSuite — so we understand what it takes to ship software and support real users." },
+  { title: "Proven delivery", desc: "Live client websites in India and Australia, plus our own SaaS products like BrokrSuite on the App Store and Google Play." },
   { title: "One team, end to end", desc: "Design, web, mobile, backend, AI and cloud under one roof, so nothing gets lost between vendors." },
   { title: "Transparent from day one", desc: "A written scope and estimate before work starts, regular demos during it and honest advice throughout." },
   { title: "Built to scale", desc: "Modern, maintainable technology chosen for your long-term needs, not trends." },
@@ -86,7 +110,7 @@ const STACK = {
 
 export function WhyUs() {
   return (
-    <Section kicker="05 — Why QuenchMark" title={<>Reasons businesses <em>choose us.</em></>}>
+    <Section kicker="06 — Why QuenchMark" title={<>Reasons businesses <em>choose us.</em></>}>
       <div className="pg-grid">
         {WHY.map((w) => <Rise key={w.title} className="pg-card"><h3>{w.title}</h3><p>{w.desc}</p></Rise>)}
       </div>
@@ -106,7 +130,7 @@ export function WhyUs() {
 }
 
 export function HomeFaq() {
-  return <Faq items={HOME_FAQS} kicker="06 — FAQ" title={<>Questions, <em>answered.</em></>} tone="tint" />;
+  return <Faq items={HOME_FAQS} kicker="07 — FAQ" title={<>Questions, <em>answered.</em></>} tone="tint" />;
 }
 
 export function HomeQuickContact() {

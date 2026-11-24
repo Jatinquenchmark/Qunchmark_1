@@ -15,7 +15,7 @@ export function IndustriesPage() {
       >
         <Link className="pg-btn pg-btn-dark" to="/reach-us#enquiry" data-cta="Discuss Your Project">Discuss Your Project <ArrowRight /></Link>
       </PageHero>
-      <Section kicker="Who we help" title={<>Industries <em>we serve.</em></>} lead="Real estate is where we run our own product, BrokrSuite. For other industries, these are solutions we can design and build around your needs.">
+      <Section kicker="Who we help" title={<>Industries <em>we serve.</em></>} lead="We've delivered client projects in real estate, health, travel and live events, and we run our own real estate CRM, BrokrSuite. For other industries, these are solutions we can design and build around your needs.">
         <div className="pg-grid-2">
           {INDUSTRIES.map((ind) => (
             <Rise key={ind.id} className="pg-card ind-card" id={ind.id}>

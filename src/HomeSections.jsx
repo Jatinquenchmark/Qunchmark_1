@@ -95,8 +95,8 @@ export function TechTeaser({ onOpen }) {
       <div className="hs-inner">
         <SectionHead
           dark
-          no="03"
-          kicker="Selected work"
+          no="04"
+          kicker="Our own products"
           title={<>Software we <em>build</em> and run.</>}
           text="Three products designed, built and operated by our team — for real estate businesses, Instagram creators and traders. The same team builds for our clients."
           action={

@@ -20,7 +20,7 @@ import { IndustriesPage } from "./pages/Industries.jsx";
 import { InsightsIndex, ArticlePage } from "./pages/Insights.jsx";
 import { AboutPage } from "./pages/About.jsx";
 import { PrivacyPage, TermsPage, NotFoundPage } from "./pages/Legal.jsx";
-import { ServicesOverview, BrokrHome, HomeProcess, IndustriesStrip, WhyUs, HomeFaq } from "./pages/HomeExtras.jsx";
+import { ServicesOverview, ClientWork, BrokrHome, HomeProcess, IndustriesStrip, WhyUs, HomeFaq } from "./pages/HomeExtras.jsx";
 
 const logoImg = "/quenchmark-logo.png";
 
@@ -519,6 +519,7 @@ function Home({ nav }) {
       <HeroThree />
       <HomeHero nav={nav} />
       <ServicesOverview />
+      <ClientWork />
       <BrokrHome />
       <TechTeaser onOpen={(chapter) => nav.open("technologies", chapter)} />
       <HomeProcess />

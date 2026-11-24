@@ -1,19 +1,21 @@
-/* Industries — written as "what we can build for you", not claimed past
-   projects. Real estate is the one industry where QuenchMark has a live product
-   (BrokrSuite), so it links there. */
+/* Industries. Past work is only claimed where it is real and live: real
+   estate (Deep Real Estate + BrokrSuite), health (Menopause India), travel
+   (My Sky Trips, TripSoul) and events (Mytix). Other industries are written as
+   solutions we can build, not as past achievements. */
 export const INDUSTRIES = [
   {
     id: "real-estate",
     name: "Real Estate",
-    lead: "We build and operate BrokrSuite, our own real estate CRM — so we understand how brokers, agencies and sales teams work.",
+    lead: "We built the website for Deep Real Estate, a Gurugram brokerage, and we build and operate BrokrSuite, our own real estate CRM — so we understand how brokers, agencies and sales teams work.",
     builds: ["Real estate CRM (BrokrSuite)", "Property listing websites", "Broker and agent mobile apps", "Lead routing and follow-up automation"],
-    link: { href: "/brokrsuite", label: "See BrokrSuite" },
+    link: { href: "/work#deep-real-estate", label: "See our real estate work" },
   },
   {
     id: "healthcare",
     name: "Healthcare",
-    lead: "Clinics and healthcare providers need systems that are easy for staff and patients, and careful with sensitive data.",
-    builds: ["Appointment booking and reminders", "Patient portals", "Clinic management software", "Telehealth-ready web and mobile apps"],
+    lead: "We built Menopause India, a women's-health education website with podcast episodes and in-depth articles. Clinics and providers also need systems that are easy for staff and patients, and careful with sensitive data.",
+    builds: ["Health-education and content websites", "Appointment booking and reminders", "Patient portals and clinic software", "Telehealth-ready web and mobile apps"],
+    link: { href: "/work#menopause-india", label: "See Menopause India" },
   },
   {
     id: "education",
@@ -49,8 +51,16 @@ export const INDUSTRIES = [
   {
     id: "hospitality-travel",
     name: "Hospitality & Travel",
-    lead: "Guests expect to discover, book and get help online. QuenchMark's own venture TripSoul operates in travel.",
+    lead: "Guests expect to discover, book and get help online. We built the My Sky Trips website for helicopter tours and spiritual journeys, and QuenchMark's own venture TripSoul operates in travel.",
     builds: ["Booking websites and engines", "Itinerary and trip-planning tools", "Guest communication automation", "Property and reservation management"],
+    link: { href: "/work#my-sky-trips", label: "See My Sky Trips" },
+  },
+  {
+    id: "events-entertainment",
+    name: "Events & Entertainment",
+    lead: "Fans want to find a show, choose a seat and pay without surprises. We built the website for Mytix, a live-event ticketing platform in Australia.",
+    builds: ["Ticketing and event product websites", "Event listings and booking journeys", "Organiser onboarding pages", "App download and marketing sites"],
+    link: { href: "/work#mytix", label: "See Mytix" },
   },
   {
     id: "enterprise",

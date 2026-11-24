@@ -115,8 +115,8 @@ export const ROUTES = {
   },
   work: {
     path: "/work",
-    title: "Our Work – Products We Built | QuenchMark Technologies",
-    description: "See the SaaS products, mobile apps and websites QuenchMark Technologies has designed and built, including BrokrSuite, DMGennie, QuantMentor, TripSoul and ParameterX.",
+    title: "Our Work – Client Projects & Products | QuenchMark Technologies",
+    description: "Client websites for Deep Real Estate, Mytix, My Sky Trips and Menopause India, plus our own products BrokrSuite, DMGennie and QuantMentor — designed and built by QuenchMark.",
     crumbs: [{ name: "Work", path: "/work" }],
   },
   industries: {

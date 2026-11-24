@@ -122,7 +122,7 @@ export function ServicePage({ slug }) {
 
       <ProcessSteps />
 
-      <Section kicker="Our work" title={<>Products <em>we&apos;ve built.</em></>} lead="We design, build and run our own software products — the same team and standards we bring to client projects." tone="tint">
+      <Section kicker="Our work" title={<>Work <em>we&apos;ve delivered.</em></>} lead="Client projects and the software products we design, build and run ourselves." tone="tint">
         <div className="pg-grid">
           {s.work.map((k) => WORK[k]).map((w) => (
             <Link key={w.title} to={w.href} className="pg-card is-link">

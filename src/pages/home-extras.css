@@ -92,3 +92,19 @@
   .ab-founder { flex-direction: column; }
   .hx-actions .hx-btn { flex: 1 1 100%; justify-content: center; }
 }
+
+/* client work: index cards (Work page) + homepage strip */
+.wk-index, .hm-clients { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.wk-index-card, .hm-client {
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 20px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.wk-index-card:hover, .hm-client:hover { transform: translateY(-4px); border-color: rgba(var(--acc-rgb), 0.35); box-shadow: 0 26px 50px -30px rgba(var(--acc-rgb), 0.45), var(--shadow-sm); }
+.wk-index-card img, .hm-client img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border-bottom: 1px solid var(--line); }
+.wk-index-card span, .hm-client-body { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem 1.15rem 1.2rem; }
+.wk-index-card b, .hm-client b { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 600; }
+.wk-index-card em, .hm-client em { font-style: normal; font-size: 0.85rem; color: var(--ink-soft); }
+.hm-client p { margin-top: 0.4rem; font-size: 0.92rem; color: var(--ink-soft); line-height: 1.55; }
+.hm-client .pg-link { margin-top: 0.7rem; font-size: 0.88rem; }
+.wk-meta { font-size: 0.9rem; font-weight: 600; color: var(--accent-rose) !important; margin-top: 0.3rem !important; }

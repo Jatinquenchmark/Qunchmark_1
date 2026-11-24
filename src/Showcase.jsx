@@ -370,6 +370,7 @@ export function HomeHero({ nav }) {
             </div>
             <ul className="hx-proof" aria-label="Highlights">
               <li>Web · Mobile · AI · Cloud</li>
+              <li>Clients in India &amp; Australia</li>
               <li>Creators of BrokrSuite</li>
               <li>Replies within 24 hours</li>
             </ul>
