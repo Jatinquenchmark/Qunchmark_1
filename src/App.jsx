@@ -950,6 +950,30 @@ function App() {
     }
     const el = document.getElementById(id);
     if (!el) return;
+    if (id === "enquiry") {
+      // Reach Us: put the form itself just under the floating navbar
+      // (wide screens: the heading + form row; stacked/mobile: the form card)
+      const land = (instant) => {
+        const target = window.innerWidth <= 1000
+          ? el.querySelector(".ru-form-card") || el
+          : el.querySelector(".ru-inner") || el;
+        const nav = document.querySelector(".nav-wrap");
+        const navH = (nav ? nav.offsetHeight : 96) + 16; // the navbar is sticky at top: 0
+        // offsetTop ignores the card's entrance transform, so we land where it settles
+        let top = 0;
+        for (let n = target; n; n = n.offsetParent) top += n.offsetTop;
+        const y = Math.max(0, top - navH);
+        if (lenis) lenis.scrollTo(y, instant ? { immediate: true } : { duration: 1.2 });
+        else window.scrollTo({ top: y, behavior: instant ? "auto" : "smooth" });
+      };
+      requestAnimationFrame(() => {
+        land(immediate);
+        // arriving from another page, the layout can still shift for a moment:
+        // re-measure once it settles and correct the jump
+        if (immediate) setTimeout(() => land(true), 300);
+      });
+      return;
+    }
     if (id === "approach") {
       // open both "flow" dropdowns, and land the section's top under the navbar
       window.dispatchEvent(new Event("qm:open-approach"));
@@ -1042,7 +1066,8 @@ function App() {
       else window.scrollTo({ top: y, behavior: "smooth" });
     },
     contact: () => setPage("contact"),
-    reachUs: () => (page === "reach-us" ? scrollToSection("home") : setPage("reach-us")),
+    /* every "Reach Us" button lands on the enquiry form */
+    reachUs: () => nav.open("reach-us", "enquiry"),
   };
   const fullPage = page === "home" || page === "ventures" || page === "technologies" || page === "reach-us";
 
