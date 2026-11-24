@@ -30,8 +30,10 @@ Commits: `92f0133` (site, SEO, funnels, tracking) · `8c1e6cd` (documentation). 
 - Security headers present (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS).
 - `/api/enquiry` live and validating; GTM loads; no console errors.
 
+**Live email test (approved, 24 Nov 2026):** one development enquiry (`QM-MWUNUIL1-IEQO`, UTM `internal-test / qa / launch-test`) and one BrokrSuite demo request (`QM-MWUNUY1E-MDW4`) were submitted through the real forms on www.quenchmark.org, using the team inbox as the "client" address. Both returned success only after Resend accepted the team email and the client confirmation — so the production key and verified sender domain work. Arrival in the Gmail inbox must be confirmed by the team.
+
 ## Not verified / not done
-- **Real email delivery** was not tested: it requires `RESEND_API_KEY` for Production and a verified Resend domain, and sending a real test would email the team inbox — awaiting your approval. See `MANUAL_SETUP_REQUIRED.md`.
+- **Inbox arrival** of the two test emails (Resend accepted them; check hiring.quenchmark@gmail.com, including Spam/Promotions).
 - The `dev` preview URL is behind Vercel login protection, so it couldn't be checked anonymously before production (build success was confirmed via Vercel's GitHub status).
 - No external accounts, listings, social posts or DNS changes were made.
 - Pages were not split per Android/iOS/etc.; they are consolidated with redirects by design.
