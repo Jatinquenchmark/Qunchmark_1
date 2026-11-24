@@ -1,0 +1,60 @@
+/* floating WhatsApp button — bottom-right on every page */
+.wa-float {
+  position: fixed;
+  right: clamp(16px, 2.5vw, 28px);
+  bottom: clamp(16px, 2.5vw, 28px);
+  z-index: 900; /* above content, below the thank-you modal */
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  height: 56px;
+  min-width: 56px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  box-shadow: 0 14px 30px -10px rgba(18, 140, 70, 0.6), 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, gap 0.3s ease, background 0.3s ease;
+  animation: waIn 0.6s 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.wa-float svg { width: 26px; height: 26px; flex: none; }
+.wa-float-label {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.35s ease, opacity 0.25s ease;
+}
+.wa-float:hover,
+.wa-float:focus-visible { background: #1ebe5a; transform: translateY(-3px); gap: 0.55rem; box-shadow: 0 18px 36px -10px rgba(18, 140, 70, 0.7), 0 2px 6px rgba(0, 0, 0, 0.12); }
+.wa-float:hover .wa-float-label,
+.wa-float:focus-visible .wa-float-label { max-width: 180px; opacity: 1; }
+.wa-float:focus-visible { outline: 3px solid rgba(37, 211, 102, 0.45); outline-offset: 3px; }
+/* gentle pulse ring so it's noticed */
+.wa-float::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5);
+  animation: waPulse 2.6s 2.2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes waIn { from { opacity: 0; transform: translateY(20px) scale(0.8); } to { opacity: 1; transform: none; } }
+@keyframes waPulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45); } 70%, 100% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); } }
+.page-hidden .wa-float { animation: none; opacity: 0; }
+@media (max-width: 640px) {
+  .wa-float { height: 52px; min-width: 52px; padding: 0 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wa-float, .wa-float::after { animation: none; }
+}
+
+/* inline WhatsApp links (Reach Us, Contact, footer) */
+.wa-inline { display: inline-flex; align-items: center; gap: 0.4rem; }
+.wa-inline svg { width: 1.05em; height: 1.05em; color: #25d366; flex: none; }
+.hs-btn-wa { background: #25d366; color: #fff; box-shadow: 0 16px 34px -18px rgba(18, 140, 70, 0.8); }
+.hs-btn-wa:hover { background: #1ebe5a; }
+.hs-btn-wa svg { width: 19px; height: 19px; }

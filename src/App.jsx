@@ -7,7 +7,8 @@ import { TechnologiesPage, HomeHero, VenturesTeaser } from "./Showcase";
 import { VenturesPage } from "./VenturesPage";
 import { TechTeaser, ClosingCTA } from "./HomeSections";
 import { ReachUsPage } from "./ReachUs";
-import { validateEnquiry, GENERAL_ENQUIRY, PUBLIC_EMAIL } from "./lib/enquiry";
+import { validateEnquiry, GENERAL_ENQUIRY, PUBLIC_EMAIL, whatsappLink, WHATSAPP_DISPLAY } from "./lib/enquiry";
+import { WhatsAppFloat, WhatsAppIcon } from "./WhatsApp";
 
 const logoImg = "/quenchmark-logo.png";
 
@@ -492,6 +493,7 @@ function Footer({ nav }) {
           <p>Building and scaling digital-first ventures across cybersecurity, AI, finance, travel, SaaS and automation.</p>
           <div className="footer-contact">
             <a href="mailto:official@quenchmark.org">official@quenchmark.org</a>
+            <a className="wa-inline" href={whatsappLink()} target="_blank" rel="noopener noreferrer"><WhatsAppIcon /> WhatsApp {WHATSAPP_DISPLAY}</a>
             <span>India-based, global vision</span>
           </div>
         </div>
@@ -821,6 +823,7 @@ function ContactPage({ nav }) {
           </p>
           <ul className="contact-points">
             <li><span>Email</span><a href={`mailto:${PUBLIC_EMAIL}`}>{PUBLIC_EMAIL}</a></li>
+            <li><span>WhatsApp</span><a className="wa-inline" href={whatsappLink()} target="_blank" rel="noopener noreferrer"><WhatsAppIcon /> {WHATSAPP_DISPLAY}</a></li>
             <li><span>Based in</span>India 🇮🇳</li>
             <li><span>Response</span>Within 24 hours</li>
             <li><span>Projects</span><button type="button" className="contact-link" onClick={() => nav.reachUs()}>Start a project enquiry →</button></li>
@@ -1065,6 +1068,7 @@ function App() {
         {page === "contact" && <ContactPage nav={nav} />}
         {page === "reach-us" && <ReachUsPage nav={nav} />}
         {fullPage ? <Footer nav={nav} /> : <MiniFooter />}
+        <WhatsAppFloat />
       </div>
     </>
   );

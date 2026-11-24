@@ -100,3 +100,9 @@ export function validateEnquiry(input = {}) {
 
   return { data, errors };
 }
+
+/* WhatsApp — opens a chat with QuenchMark directly (wa.me works on phones and desktop) */
+export const WHATSAPP_NUMBER = "918851484102";
+export const WHATSAPP_DISPLAY = "+91 88514 84102";
+export const whatsappLink = (text = "Hi QuenchMark, I'd like to discuss a project.") =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;

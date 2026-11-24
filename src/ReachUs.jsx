@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { SERVICES, BUDGETS, CONTACT_METHODS, PUBLIC_EMAIL, LIMITS, validateEnquiry } from "./lib/enquiry";
+import { SERVICES, BUDGETS, CONTACT_METHODS, PUBLIC_EMAIL, LIMITS, validateEnquiry, whatsappLink, WHATSAPP_DISPLAY } from "./lib/enquiry";
+import { WhatsAppIcon } from "./WhatsApp";
 import "./reachus.css";
 
 /* Reach Us — the lead-generation page that replaced Careers.
@@ -287,6 +288,7 @@ export function ReachUsPage({ nav }) {
             </p>
             <div className="ru-hero-actions">
               <button type="button" className="hs-btn hs-btn-dark" onClick={() => toForm()}>Tell Us About Your Project <Arrow /></button>
+              <a className="hs-btn hs-btn-wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer"><WhatsAppIcon /> Chat on WhatsApp</a>
               <a className="ru-mail" href={`mailto:${PUBLIC_EMAIL}`}>{PUBLIC_EMAIL}</a>
             </div>
           </div>
@@ -372,7 +374,8 @@ export function ReachUsPage({ nav }) {
               ))}
             </ol>
             <div className="ru-direct">
-              <span>Prefer email?</span>
+              <span>Prefer to talk directly?</span>
+              <a className="wa-inline" href={whatsappLink()} target="_blank" rel="noopener noreferrer"><WhatsAppIcon /> WhatsApp {WHATSAPP_DISPLAY}</a>
               <a href={`mailto:${PUBLIC_EMAIL}`}>{PUBLIC_EMAIL}</a>
             </div>
           </div>
