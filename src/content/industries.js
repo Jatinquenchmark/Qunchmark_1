@@ -1,14 +1,14 @@
 /* Industries. Past work is only claimed where it is real and live: real
-   estate (Deep Real Estate + BrokrSuite), health (Menopause India), travel
+   estate & facilities (Anytime Help, Deep Real Estate, BrokrSuite), health (Menopause India), travel
    (My Sky Trips, TripSoul) and events (Mytix). Other industries are written as
    solutions we can build, not as past achievements. */
 export const INDUSTRIES = [
   {
     id: "real-estate",
     name: "Real Estate",
-    lead: "We built the website for Deep Real Estate, a Gurugram brokerage, and we build and operate BrokrSuite, our own real estate CRM — so we understand how brokers, agencies and sales teams work.",
-    builds: ["Real estate CRM (BrokrSuite)", "Property listing websites", "Broker and agent mobile apps", "Lead routing and follow-up automation"],
-    link: { href: "/work#deep-real-estate", label: "See our real estate work" },
+    lead: "We built Anytime Help — a society maintenance platform with apps, website and admin panel, used by 3,000+ people — and the website for Deep Real Estate, a Gurugram brokerage. We also run BrokrSuite, our own real estate CRM.",
+    builds: ["Society & facility management apps (Anytime Help)", "Real estate CRM (BrokrSuite)", "Property listing websites", "Broker and agent mobile apps"],
+    link: { href: "/work#anytime-help", label: "See our property & facility work" },
   },
   {
     id: "healthcare",

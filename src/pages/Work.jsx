@@ -31,6 +31,7 @@ function ClientCase({ p, i }) {
           <span className="pg-tag">{p.label}</span>
           <h2>{p.name}</h2>
           <p className="wk-meta">{p.industry} · {p.location}</p>
+          {p.stat && <p className="wk-stat"><b>{p.stat.value}</b> {p.stat.label}</p>}
           <p className="wk-summary">{p.summary}</p>
           <h3>The client</h3>
           <p>{p.client}</p>
@@ -38,6 +39,12 @@ function ClientCase({ p, i }) {
           <p>{p.challenge}</p>
           <h3>What we built</h3>
           <ul className="wk-built">{p.built.map((b) => <li key={b}>{b}</li>)}</ul>
+          {(p.appStore || p.playStore) && (
+            <p className="wk-stores">
+              {p.appStore && <a href={p.appStore} target="_blank" rel="noopener">App Store</a>}
+              {p.playStore && <a href={p.playStore} target="_blank" rel="noopener">Google Play</a>}
+            </p>
+          )}
           <div className="pg-actions">
             <a className="pg-btn pg-btn-dark" href={p.url} target="_blank" rel="noopener" data-cta={`visit:${p.id}`}>Visit {p.domain} <ArrowRight /></a>
             <Link className="pg-btn pg-btn-ghost" to="/reach-us#enquiry" data-cta={`similar:${p.id}`}>Discuss a similar project</Link>
@@ -82,18 +89,18 @@ export function WorkPage() {
         crumbs={m.crumbs}
         kicker="Our work"
         title={<>Websites and products <em>we&apos;ve designed and built.</em></>}
-        lead="From client websites in India and Australia to our own SaaS products on the App Store and Google Play — here's a selection of what our team has delivered."
+        lead="From a society-maintenance platform used by 3,000+ people to client websites in India and Australia and our own SaaS products — here's a selection of what our team has delivered."
       >
         <Link className="pg-btn pg-btn-dark" to="/reach-us#enquiry" data-cta="Discuss a similar project">Discuss Your Project <ArrowRight /></Link>
         <Link className="pg-btn pg-btn-ghost" to="#client-projects">See client projects</Link>
       </PageHero>
 
-      <Section id="client-projects" kicker="Client projects" title={<>Websites we&apos;ve built <em>for our clients.</em></>} lead="Real estate, live-event ticketing, travel and health — built for businesses in India and Australia." tone="white">
+      <Section id="client-projects" kicker="Client projects" title={<>Apps and websites we&apos;ve built <em>for our clients.</em></>} lead="Facility management, real estate, live-event ticketing, travel and health — built for businesses in India and Australia." tone="white">
         <div className="wk-index">
           {CLIENT_PROJECTS.map((p) => (
-            <Link key={p.id} to={`#${p.id}`} className="wk-index-card">
+            <Link key={p.id} to={`#${p.id}`} className={`wk-index-card ${p.featured ? "is-featured" : ""}`}>
               <img src={p.shot} alt="" width="1440" height="900" loading="lazy" decoding="async" />
-              <span><b>{p.name}</b><em>{p.industry} · {p.location}</em></span>
+              <span><b>{p.name}</b><em>{p.industry} · {p.location}</em>{p.stat && <strong className="wk-chip">{p.stat.value} {p.stat.label}</strong>}</span>
             </Link>
           ))}
         </div>

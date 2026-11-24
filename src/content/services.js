@@ -23,6 +23,7 @@ export const ENGAGEMENT_MODELS = [
 
 /* in-house builds we can genuinely point to (keys match src/brands.js) */
 export const WORK = {
+  anytime: { title: "Anytime Help", type: "Client project · Apps, website & admin panel", desc: "Society maintenance platform built from scratch — iPhone and Android apps, website and admin panel, with photo-proof tickets and department routing. 3,000+ users.", href: "/work#anytime-help" },
   deep: { title: "Deep Real Estate", type: "Client project · Website", desc: "Website for a Gurugram real estate brokerage: property listings, master-plan maps library and local infrastructure updates.", href: "/work#deep-real-estate" },
   mytix: { title: "Mytix", type: "Client project · Website", desc: "Product website for an Australian live-event ticketing platform with iPhone and Android apps.", href: "/work#mytix" },
   skytrips: { title: "My Sky Trips", type: "Client project · Website", desc: "Travel website for helicopter tours and spiritual journeys in India, with package catalogue and enquiries.", href: "/work#my-sky-trips" },
@@ -76,7 +77,7 @@ export const SERVICES = [
       "A growing team moving from an ageing desktop tool to a secure web application",
     ],
     tech: ["React", "Node.js", "TypeScript", "Python", "PostgreSQL", "REST & GraphQL APIs", "AWS", "Docker"],
-    work: ["brokr", "dmg", "qm"],
+    work: ["anytime", "brokr", "dmg"],
     related: ["web-development", "crm-development", "business-automation", "software-maintenance"],
     faqs: [
       { q: "How much does custom software development cost?", a: "It depends on the number of features, user roles, integrations and platforms. After a free consultation we give you a written scope and estimate, and we can split the work into phases so you start with the most valuable features first." },
@@ -175,12 +176,13 @@ export const SERVICES = [
       "Ongoing updates as operating systems change",
     ],
     useCases: [
+      "A housing society platform where residents report issues with a photo and staff close them with proof — like Anytime Help, which we built",
       "A real estate business giving brokers properties, leads and follow-ups on their phones",
       "A service company letting customers book and track appointments",
       "A field team capturing orders and visit reports on the move",
     ],
     tech: ["React Native", "Flutter", "Swift", "Kotlin", "Node.js", "Firebase", "PostgreSQL", "App Store & Google Play"],
-    work: ["brokr", "dmg"],
+    work: ["anytime", "brokr", "dmg"],
     related: ["ui-ux-design", "saas-development", "software-development", "software-maintenance"],
     faqs: [
       { q: "Should I build for Android, iOS or both?", a: "It depends on where your users are. In India Android has the larger share, while iOS is significant in markets like the US and UK. Cross-platform development often lets you launch on both without doubling the cost." },
@@ -232,7 +234,7 @@ export const SERVICES = [
       "A startup rebuilding a fragile prototype into a scalable platform",
     ],
     tech: ["React", "Next.js", "Node.js", "TypeScript", "PostgreSQL", "Stripe / Razorpay", "AWS", "Vercel"],
-    work: ["brokr", "dmg", "qm"],
+    work: ["anytime", "brokr", "dmg"],
     related: ["ui-ux-design", "mobile-app-development", "cloud-devops", "ai-integration"],
     faqs: [
       { q: "What is an MVP?", a: "A minimum viable product is the smallest version of your product that delivers real value to users and lets you test your main assumptions. It is a starting point, not a cut-down prototype." },
@@ -284,7 +286,7 @@ export const SERVICES = [
       "Creating a design system for a product with several teams",
     ],
     tech: ["Figma", "Design systems", "Prototyping", "Usability testing", "Accessibility (WCAG)"],
-    work: ["mytix", "menopause", "skytrips", "brokr"],
+    work: ["anytime", "mytix", "menopause", "skytrips"],
     related: ["web-development", "mobile-app-development", "saas-development"],
     faqs: [
       { q: "Do you only design, or also build?", a: "Both. We can design only, or design and develop together so the product that ships matches the design." },
@@ -387,7 +389,7 @@ export const SERVICES = [
       "Automating Instagram replies through the official Meta API, as in our product DMGennie",
     ],
     tech: ["Node.js", "Python", "REST & GraphQL", "Webhooks", "Meta & WhatsApp Business APIs", "Zapier / Make / n8n", "Cloud functions"],
-    work: ["dmg", "brokr"],
+    work: ["dmg", "anytime", "brokr"],
     related: ["ai-integration", "crm-development", "software-development"],
     faqs: [
       { q: "Which processes should we automate first?", a: "Start with tasks that are frequent, rule-based and error-prone, such as data entry, routing enquiries or generating routine reports. We help you rank them by time saved." },

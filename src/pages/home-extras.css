@@ -108,3 +108,21 @@
 .hm-client p { margin-top: 0.4rem; font-size: 0.92rem; color: var(--ink-soft); line-height: 1.55; }
 .hm-client .pg-link { margin-top: 0.7rem; font-size: 0.88rem; }
 .wk-meta { font-size: 0.9rem; font-weight: 600; color: var(--accent-rose) !important; margin-top: 0.3rem !important; }
+
+/* featured client (Anytime Help): full-width horizontal card */
+@media (min-width: 820px) {
+  .hm-clients { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .hm-client.is-featured, .wk-index-card.is-featured { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; }
+  .hm-client.is-featured img, .wk-index-card.is-featured img { border-bottom: 0; border-right: 1px solid var(--line); height: 100%; }
+  .hm-client.is-featured .hm-client-body, .wk-index-card.is-featured span { padding: 1.8rem 2rem; gap: 0.45rem; }
+  .hm-client.is-featured b, .wk-index-card.is-featured b { font-size: 1.8rem; }
+  .hm-client.is-featured p { font-size: 1rem; }
+}
+.wk-index { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+@media (min-width: 820px) { .wk-index { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.wk-chip { align-self: flex-start; margin-top: 0.35rem; padding: 0.3rem 0.7rem; border-radius: 999px; background: var(--accent-tint); color: var(--accent-rose); font-size: 0.82rem; font-weight: 700; }
+.wk-stat { margin-top: 0.6rem !important; color: var(--ink) !important; font-size: 1rem; }
+.wk-stat b { font-family: var(--font-serif); font-size: 2rem; color: var(--accent-rose); margin-right: 0.25rem; }
+.wk-stores { display: flex; gap: 0.6rem; margin-top: 1rem !important; }
+.wk-stores a { padding: 0.45rem 0.9rem; border-radius: 10px; background: #0f1115; color: #fff; font-size: 0.85rem; font-weight: 600; }
+.wk-stores a:hover { background: #2a2f37; }

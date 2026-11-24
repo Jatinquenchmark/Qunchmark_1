@@ -116,7 +116,7 @@ export const ROUTES = {
   work: {
     path: "/work",
     title: "Our Work – Client Projects & Products | QuenchMark Technologies",
-    description: "Client websites for Deep Real Estate, Mytix, My Sky Trips and Menopause India, plus our own products BrokrSuite, DMGennie and QuantMentor — designed and built by QuenchMark.",
+    description: "Client work including Anytime Help (apps, website and admin panel, 3,000+ users), Deep Real Estate, Mytix, My Sky Trips and Menopause India — plus our own product BrokrSuite.",
     crumbs: [{ name: "Work", path: "/work" }],
   },
   industries: {

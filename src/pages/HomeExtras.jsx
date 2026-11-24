@@ -25,14 +25,16 @@ export function ServicesOverview() {
 
 export function ClientWork() {
   return (
-    <Section id="client-work" kicker="02 — Client work" title={<>Websites we&apos;ve built <em>for our clients.</em></>} lead="Real estate in Gurugram, live-event ticketing in Australia, helicopter travel and women's health — designed and developed by our team." tone="tint">
+    <Section id="client-work" kicker="02 — Client work" title={<>Apps and websites we&apos;ve built <em>for our clients.</em></>} lead="A society-maintenance platform with 3,000+ users, real estate in Gurugram, live-event ticketing in Australia, helicopter travel and women's health — designed and developed by our team." tone="tint">
       <div className="hm-clients">
         {CLIENT_PROJECTS.map((c) => (
-          <Link key={c.id} to={`/work#${c.id}`} className="hm-client" data-cta={`home-client:${c.id}`}>
+          <Link key={c.id} to={`/work#${c.id}`} className={`hm-client ${c.featured ? "is-featured" : ""}`} data-cta={`home-client:${c.id}`}>
             <img src={c.shot} alt={`${c.name} website (${c.domain})`} width="1440" height="900" loading="lazy" decoding="async" />
             <span className="hm-client-body">
+              {c.featured && <span className="pg-tag">{c.label}</span>}
               <b>{c.name}</b>
               <em>{c.industry} · {c.location}</em>
+              {c.stat && <strong className="wk-chip">{c.stat.value} {c.stat.label}</strong>}
               <p>{c.short}</p>
               <span className="pg-link">View case study <ArrowRight /></span>
             </span>
@@ -93,7 +95,7 @@ export function IndustriesStrip() {
 }
 
 const WHY = [
-  { title: "Proven delivery", desc: "Live client websites in India and Australia, plus our own SaaS products like BrokrSuite on the App Store and Google Play." },
+  { title: "Proven delivery", desc: "Apps, admin panels and websites built from scratch for clients — including Anytime Help, used by 3,000+ people — plus our own products like BrokrSuite." },
   { title: "One team, end to end", desc: "Design, web, mobile, backend, AI and cloud under one roof, so nothing gets lost between vendors." },
   { title: "Transparent from day one", desc: "A written scope and estimate before work starts, regular demos during it and honest advice throughout." },
   { title: "Built to scale", desc: "Modern, maintainable technology chosen for your long-term needs, not trends." },
