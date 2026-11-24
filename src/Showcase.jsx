@@ -1,3 +1,5 @@
+import { whatsappLink } from "./lib/enquiry";
+import { WhatsAppIcon } from "./WhatsApp";
 import { useEffect, useRef, useState } from "react";
 import { ventures, products } from "./brands";
 import "./showcase.css";
@@ -343,26 +345,34 @@ export function HomeHero({ nav }) {
       <div className="hx-glow" aria-hidden="true" />
       <div className="hx-inner">
         <div className="hx-top">
-          <span className="hx-meta"></span>
+          <span className="hs-kicker">QuenchMark Technologies · Software development company</span>
         </div>
         <h1 className="hx-title">
-          <span className="hx-line"><span>Powerful businesses,</span></span>
-          <span className="hx-line"><span>built <em>under one vision.</em></span></span>
+          <span className="hx-line"><span>Software that builds,</span></span>
+          <span className="hx-line"><span>scales <em>and transforms.</em></span></span>
         </h1>
         <div className="hx-row">
           <div className="hx-copy">
             <p className="hx-lede">
-              Quenchmark builds and runs companies and software in travel, cybersecurity,
-              real estate tech, creator tools and AI trading.
+              Your technology partner for websites, mobile apps, custom software, SaaS and AI —
+              taking your idea from concept to design, development, launch and long-term support.
             </p>
             <div className="hx-actions">
-              <button type="button" className="hx-btn hx-btn-solid" onClick={() => nav.open("ventures")}>
-                Explore Ventures <Arrow d="M5 12h14M13 6l6 6-6 6" />
-              </button>
-              <button type="button" className="hx-btn hx-btn-ghost" onClick={() => nav.open("technologies")}>
-                Explore Technologies
-              </button>
+              <a href="/reach-us#enquiry" className="hx-btn hx-btn-solid" onClick={(e) => { e.preventDefault(); nav.reachUs(); }} data-cta="Request a Free Quote">
+                Request a Free Quote <Arrow d="M5 12h14M13 6l6 6-6 6" />
+              </a>
+              <a href="/contact" className="hx-btn hx-btn-ghost" onClick={(e) => { e.preventDefault(); nav.go("/contact"); }} data-cta="Discuss Your Project">
+                Discuss Your Project
+              </a>
+              <a href={whatsappLink("Hi QuenchMark, I'd like a free consultation for my project.")} className="hx-btn hx-btn-wa" target="_blank" rel="noopener noreferrer" data-track="home-hero" aria-label="Free consultation on WhatsApp">
+                <WhatsAppIcon /> WhatsApp
+              </a>
             </div>
+            <ul className="hx-proof" aria-label="Highlights">
+              <li>Web · Mobile · AI · Cloud</li>
+              <li>Creators of BrokrSuite</li>
+              <li>Replies within 24 hours</li>
+            </ul>
           </div>
           <div className="hx-deck">
             {deck.map((b, i) => {
@@ -374,7 +384,7 @@ export function HomeHero({ nav }) {
                   className={`hx-card ${o > 0 ? "is-right" : ""}`}
                   style={{ "--c": b.color, "--o": o, "--a": Math.abs(o), "--i": i, zIndex: 10 - Math.abs(o) }}
                   onClick={() => nav.open(b.page, b.chapter)}
-                  aria-label={`${b.title}: open in ${b.page === "ventures" ? "Ventures" : "Technologies"}`}
+                  aria-label={`${b.title} — ${b.category}: see this ${b.page === "ventures" ? "venture" : "product"}`}
                 >
                   <span className="hx-card-media" />
                   <span className="hx-card-top">

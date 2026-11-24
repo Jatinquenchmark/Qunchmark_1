@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { SERVICES, BUDGETS, CONTACT_METHODS, PUBLIC_EMAIL, LIMITS, validateEnquiry, whatsappLink, WHATSAPP_DISPLAY } from "./lib/enquiry";
+import { SERVICES, FORM_SERVICES, BUDGETS, CONTACT_METHODS, PUBLIC_EMAIL, LIMITS, validateEnquiry, whatsappLink, WHATSAPP_DISPLAY } from "./lib/enquiry";
+import { attribution, track } from "./lib/track";
 import { WhatsAppIcon } from "./WhatsApp";
 import "./reachus.css";
 
@@ -55,8 +56,9 @@ const EMPTY = { name: "", company: "", email: "", phone: "", service: "", budget
 const FIELD_ORDER = ["name", "email", "phone", "service", "budget", "description", "contactMethod"];
 
 /* ---------------- enquiry form ---------------- */
-function EnquiryForm({ preset }) {
-  const [values, setValues] = useState(EMPTY);
+/* exported so service pages can embed it with their service pre-selected */
+export function EnquiryForm({ preset = { service: "", n: 0 }, defaultService = "" }) {
+  const [values, setValues] = useState(() => ({ ...EMPTY, service: defaultService }));
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
@@ -116,13 +118,15 @@ function EnquiryForm({ preset }) {
       const r = await fetch("/api/enquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, elapsedMs: Date.now() - startedAt.current }),
+        body: JSON.stringify({ ...values, formType: "development", attribution: attribution(), elapsedMs: Date.now() - startedAt.current }),
       });
       const json = await r.json().catch(() => ({}));
       if (r.ok && json.ok) {
         setReceipt({ ref: json.ref || "", confirmation: !!json.confirmation });
+        // conversion event — service and page only, never personal details
+        track("generate_lead", { lead_type: "development", service: values.service, budget_range: values.budget || "not_specified", contact_method: values.contactMethod, form_location: window.location.pathname });
         setStatus("sent");
-        setValues(EMPTY);
+        setValues({ ...EMPTY, service: defaultService });
         setTouched({});
         return;
       }
@@ -192,7 +196,7 @@ function EnquiryForm({ preset }) {
         <div className="ru-select">
           <select required {...fieldProps("service")}>
             <option value="" disabled>Choose a service</option>
-            {SERVICES.map((s) => <option key={s.key} value={s.title}>{s.title}</option>)}
+            {FORM_SERVICES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
         {errNode("service")}
@@ -316,7 +320,7 @@ export function ReachUsPage({ nav }) {
                 className={`ru-card ${s.key === "other" ? "ru-card-wide" : ""}`}
                 style={{ "--i": i }}
                 onMouseMove={glow}
-                onClick={() => toForm(s.title)}
+                onClick={() => toForm(s.formService)}
                 aria-label={`${s.title}: ${s.desc} Start an enquiry`}
               >
                 <span className="ru-card-light" aria-hidden="true" />

@@ -9,7 +9,7 @@
  *   UPSTASH_REDIS_REST_URL    optional  shared rate limiting across all serverless instances
  *   UPSTASH_REDIS_REST_TOKEN  optional  (without these, a per-instance in-memory limit is used)
  */
-import { validateEnquiry, PUBLIC_EMAIL } from "../src/lib/enquiry.js";
+import { validateEnquiry, validateBrokrLead, cleanAttribution, PUBLIC_EMAIL } from "../src/lib/enquiry.js";
 
 const RESEND_URL = "https://api.resend.com/emails";
 const DEFAULT_TO = "hiring.quenchmark@gmail.com";
@@ -121,11 +121,32 @@ function shell(inner, preheader) {
 <tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#ffffff;border-radius:22px;overflow:hidden;border:1px solid #e6e8ec">
 ${inner}
-<tr><td style="padding:20px 32px;background:#0f1115;color:#9aa1ad;font-size:12px">QuenchMark · <a href="https://quenchmark.org" style="color:#a5b4fc;text-decoration:none">quenchmark.org</a> · ${PUBLIC_EMAIL}</td></tr>
+<tr><td style="padding:20px 32px;background:#0f1115;color:#9aa1ad;font-size:12px">QuenchMark · <a href="https://www.quenchmark.org" style="color:#a5b4fc;text-decoration:none">quenchmark.org</a> · ${PUBLIC_EMAIL}</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
-function teamEmail(d, meta) {
+/* where the lead came from — page, first landing page, referrer, UTM campaign */
+function sourceRows(a = {}) {
+  const utm = [a.utm_source, a.utm_medium, a.utm_campaign].filter(Boolean).join(" / ");
+  return `<tr><td style="padding:8px 32px 4px"><div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5f6672;font-weight:700;margin:6px 0 4px">Lead source</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    ${row("Submitted from", a.pageUrl)}
+    ${row("First landing page", a.landingPage)}
+    ${row("Referrer", a.referrer || "Direct / unknown")}
+    ${row("Campaign (UTM)", utm || "None")}
+    ${a.utm_term || a.utm_content ? row("UTM term / content", [a.utm_term, a.utm_content].filter(Boolean).join(" / ")) : ""}
+  </table></td></tr>`;
+}
+const sourceText = (a = {}) => [
+  "",
+  "Lead source:",
+  `Submitted from: ${a.pageUrl || "—"}`,
+  `First landing page: ${a.landingPage || "—"}`,
+  `Referrer: ${a.referrer || "Direct / unknown"}`,
+  `Campaign (UTM): ${[a.utm_source, a.utm_medium, a.utm_campaign].filter(Boolean).join(" / ") || "None"}`,
+].join("\n");
+
+function teamEmail(d, meta, a) {
   const waDigits = d.phone.replace(/\D/g, "");
   const inner = `
 <tr><td style="padding:32px;background:linear-gradient(135deg,#151a26,#0f1219);color:#eef0f4">
@@ -149,6 +170,7 @@ function teamEmail(d, meta) {
   <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5f6672;font-weight:700;margin-bottom:10px">Project description</div>
   <div style="background:#f6f7f9;border:1px solid #eceef2;border-radius:14px;padding:18px;font-size:15px;line-height:1.65;color:#0f1115;white-space:pre-wrap">${esc(d.description)}</div>
 </td></tr>
+${sourceRows(a)}
 <tr><td style="padding:20px 32px 30px">
   <a href="mailto:${esc(d.email)}?subject=${encodeURIComponent(`Re: Your QuenchMark enquiry – ${d.service}`)}" style="display:inline-block;background:#0f1115;color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:999px">Reply by email</a>
   <a href="https://wa.me/${waDigits}" style="display:inline-block;margin-left:8px;background:#eef0ff;color:#4f46e5;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:999px">Open WhatsApp</a>
@@ -157,7 +179,7 @@ function teamEmail(d, meta) {
   return shell(inner, `${d.name} needs ${d.service}`);
 }
 
-function teamText(d, meta) {
+function teamText(d, meta, a) {
   return [
     `New QuenchMark business enquiry — ${d.service}`,
     "",
@@ -174,7 +196,77 @@ function teamText(d, meta) {
     d.description,
     "",
     `Reference: ${meta.ref}`,
-  ].join("\n");
+  ].join("\n") + sourceText(a);
+}
+
+/* ---------- BrokrSuite lead ---------- */
+function brokrTeamEmail(d, meta, a) {
+  const waDigits = d.phone.replace(/\D/g, "");
+  const inner = `
+<tr><td style="padding:32px;background:linear-gradient(135deg,#1d1a4a,#0f1219);color:#eef0f4">
+  <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#a5b4fc;font-weight:700">New BrokrSuite business lead</div>
+  <div style="font-family:Georgia,serif;font-size:28px;font-weight:600;margin-top:8px;line-height:1.2">${esc(d.interest)}</div>
+  <div style="margin-top:8px;font-size:14px;color:#9aa1ad">from ${esc(d.name)}${d.company ? ` · ${esc(d.company)}` : ""}${d.city ? ` · ${esc(d.city)}` : ""}</div>
+</td></tr>
+<tr><td style="padding:24px 32px 8px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    ${row("Full name", d.name)}
+    ${row("Company", d.company)}
+    ${row("Email", d.email, { link: `mailto:${d.email}` })}
+    ${row("Phone / WhatsApp", d.phone, { link: `tel:${d.phone.replace(/[^\d+]/g, "")}` })}
+    ${row("City", d.city)}
+    ${row("Team size", d.teamSize || "Not specified")}
+    ${row("Current CRM / software", d.currentSoftware || "Not specified")}
+    ${row("Interested in", d.interest)}
+    ${row("Submitted", meta.time)}
+  </table>
+</td></tr>
+<tr><td style="padding:16px 32px 8px">
+  <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5f6672;font-weight:700;margin-bottom:10px">Business requirements</div>
+  <div style="background:#f6f7f9;border:1px solid #eceef2;border-radius:14px;padding:18px;font-size:15px;line-height:1.65;color:#0f1115;white-space:pre-wrap">${esc(d.requirements || "—")}</div>
+</td></tr>
+${sourceRows(a)}
+<tr><td style="padding:20px 32px 30px">
+  <a href="https://wa.me/${waDigits}" style="display:inline-block;background:#25d366;color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:999px">Open WhatsApp</a>
+  <a href="mailto:${esc(d.email)}?subject=${encodeURIComponent("Your BrokrSuite demo")}" style="display:inline-block;margin-left:8px;background:#0f1115;color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:999px">Reply by email</a>
+  <div style="margin-top:14px;font-size:12px;color:#9aa1ad">Reference ${esc(meta.ref)} · Hitting “Reply” answers the lead directly.</div>
+</td></tr>`;
+  return shell(inner, `${d.name} — ${d.interest} (BrokrSuite)`);
+}
+
+const brokrTeamText = (d, meta, a) => [
+  `New BrokrSuite business lead — ${d.interest}`,
+  "",
+  `Full name: ${d.name}`,
+  `Company: ${d.company || "—"}`,
+  `Email: ${d.email}`,
+  `Phone / WhatsApp: ${d.phone}`,
+  `City: ${d.city || "—"}`,
+  `Team size: ${d.teamSize || "Not specified"}`,
+  `Current CRM / software: ${d.currentSoftware || "Not specified"}`,
+  `Interested in: ${d.interest}`,
+  `Submitted: ${meta.time}`,
+  "",
+  "Business requirements:",
+  d.requirements || "—",
+  "",
+  `Reference: ${meta.ref}`,
+].join("\n") + sourceText(a);
+
+function brokrClientEmail(d) {
+  const first = d.name.split(" ")[0];
+  const inner = `
+<tr><td style="padding:36px 32px 12px">
+  <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#4f46e5;font-weight:700">BrokrSuite · Request received</div>
+  <div style="font-family:Georgia,serif;font-size:28px;font-weight:600;margin-top:10px;color:#0f1115;line-height:1.2">Thank you, ${esc(first)}.</div>
+  <p style="font-size:15px;line-height:1.7;color:#5f6672;margin:14px 0 0">We've received your request (<strong style="color:#0f1115">${esc(d.interest.toLowerCase())}</strong>). Our team will contact you shortly to understand your business and show you how BrokrSuite can help.</p>
+  <p style="font-size:15px;line-height:1.7;color:#5f6672;margin:14px 0 0">In the meantime, you can download the BrokrSuite app from the <a href="https://apps.apple.com/in/app/brokrsuite/id6807412019" style="color:#4f46e5">App Store</a> or <a href="https://play.google.com/store/apps/details?id=com.brokrsuite.app" style="color:#4f46e5">Google Play</a>.</p>
+</td></tr>
+<tr><td style="padding:12px 32px 32px;font-size:14px;line-height:1.7;color:#5f6672">
+  Questions? Reply to this email or write to <a href="mailto:${PUBLIC_EMAIL}" style="color:#4f46e5;text-decoration:none">${PUBLIC_EMAIL}</a>.
+  <div style="margin-top:18px;color:#0f1115;font-weight:600">— The BrokrSuite team at QuenchMark</div>
+</td></tr>`;
+  return shell(inner, "We've received your BrokrSuite request and will be in touch shortly.");
 }
 
 function clientEmail(d) {
@@ -234,7 +326,9 @@ export default async function handler(req, res) {
     });
   }
 
-  const { data, errors } = validateEnquiry(body);
+  const isBrokr = body.formType === "brokrsuite";
+  const { data, errors } = isBrokr ? validateBrokrLead(body) : validateEnquiry(body);
+  const attr = cleanAttribution(body.attribution);
   if (Object.keys(errors).length) {
     return send(res, 422, { ok: false, error: "Please correct the highlighted fields.", fields: errors });
   }
@@ -250,7 +344,7 @@ export default async function handler(req, res) {
 
   if (!apiKey) {
     // never lose a lead silently: the full enquiry is written to the function logs
-    console.error("[enquiry] RESEND_API_KEY is not set — ENQUIRY_NOT_DELIVERED", JSON.stringify({ ...data, ...meta }));
+    console.error("[enquiry] RESEND_API_KEY is not set — ENQUIRY_NOT_DELIVERED", JSON.stringify({ formType: isBrokr ? "brokrsuite" : "development", ...data, ...meta, ...attr }));
     return send(res, 503, {
       ok: false,
       error: `Our enquiry service is temporarily unavailable. Please email us directly at ${PUBLIC_EMAIL}.`,
@@ -264,15 +358,14 @@ export default async function handler(req, res) {
         from,
         to,
         reply_to: data.email,
-        subject: `New QuenchMark Business Enquiry – ${data.service}`,
-        html: teamEmail(data, meta),
-        text: teamText(data, meta),
-        tags: [{ name: "source", value: "reach-us" }],
+        ...(isBrokr
+          ? { subject: "New BrokrSuite Business Lead", html: brokrTeamEmail(data, meta, attr), text: brokrTeamText(data, meta, attr), tags: [{ name: "lead_type", value: "brokrsuite" }] }
+          : { subject: `New QuenchMark Business Enquiry – ${data.service}`, html: teamEmail(data, meta, attr), text: teamText(data, meta, attr), tags: [{ name: "lead_type", value: "development" }] }),
       },
       `${meta.ref}-team`
     );
   } catch (e) {
-    console.error("[enquiry] team email failed — ENQUIRY_NOT_DELIVERED", e.message, JSON.stringify({ ...data, ...meta }));
+    console.error("[enquiry] team email failed — ENQUIRY_NOT_DELIVERED", e.message, JSON.stringify({ formType: isBrokr ? "brokrsuite" : "development", ...data, ...meta, ...attr }));
     return send(res, 502, {
       ok: false,
       error: `We couldn't send your enquiry just now. Please try again in a moment, or email us at ${PUBLIC_EMAIL}.`,
@@ -289,9 +382,17 @@ export default async function handler(req, res) {
           from,
           to: [data.email],
           reply_to: PUBLIC_EMAIL,
-          subject: "We've received your enquiry – QuenchMark",
-          html: clientEmail(data),
-          text: `Hi ${data.name.split(" ")[0]},\n\nThank you for contacting QuenchMark. We've received your enquiry about ${data.service} and will get in touch by ${data.contactMethod.toLowerCase()}, usually within 24 hours.\n\nHave something to add? Reply to this email or write to ${PUBLIC_EMAIL}.\n\n— The QuenchMark team`,
+          ...(isBrokr
+            ? {
+                subject: "We've received your BrokrSuite request",
+                html: brokrClientEmail(data),
+                text: `Hi ${data.name.split(" ")[0]},\n\nThank you for your interest in BrokrSuite. We've received your request (${data.interest.toLowerCase()}) and our team will contact you shortly.\n\nQuestions? Reply to this email or write to ${PUBLIC_EMAIL}.\n\n— The BrokrSuite team at QuenchMark`,
+              }
+            : {
+                subject: "We've received your enquiry – QuenchMark",
+                html: clientEmail(data),
+                text: `Hi ${data.name.split(" ")[0]},\n\nThank you for contacting QuenchMark. We've received your enquiry about ${data.service} and will get in touch by ${data.contactMethod.toLowerCase()}, usually within 24 hours.\n\nHave something to add? Reply to this email or write to ${PUBLIC_EMAIL}.\n\n— The QuenchMark team`,
+              }),
         },
         `${meta.ref}-client`
       );

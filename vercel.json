@@ -1,16 +1,181 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
-    { "source": "/careers", "destination": "/reach-us", "permanent": true },
-    { "source": "/careers/:path*", "destination": "/reach-us", "permanent": true }
-  ],
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/careers",
+      "destination": "/reach-us",
+      "permanent": true
+    },
+    {
+      "source": "/careers/:path*",
+      "destination": "/reach-us",
+      "permanent": true
+    },
+    {
+      "source": "/broksuite",
+      "destination": "/brokrsuite",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/insights",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/work",
+      "permanent": true
+    },
+    {
+      "source": "/get-a-quote",
+      "destination": "/reach-us",
+      "permanent": true
+    },
+    {
+      "source": "/services/custom-software-development",
+      "destination": "/services/software-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/enterprise-software-development",
+      "destination": "/services/software-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/legacy-modernization",
+      "destination": "/services/software-maintenance",
+      "permanent": true
+    },
+    {
+      "source": "/services/technology-consulting",
+      "destination": "/services/software-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/web-application-development",
+      "destination": "/services/web-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/website-development",
+      "destination": "/services/web-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/ecommerce-development",
+      "destination": "/services/web-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/android-app-development",
+      "destination": "/services/mobile-app-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/ios-app-development",
+      "destination": "/services/mobile-app-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/cross-platform-development",
+      "destination": "/services/mobile-app-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/mvp-development",
+      "destination": "/services/saas-development",
+      "permanent": true
+    },
+    {
+      "source": "/services/product-design",
+      "destination": "/services/ui-ux-design",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai-agent-development",
+      "destination": "/services/ai-integration",
+      "permanent": true
+    },
+    {
+      "source": "/services/ai-chatbot-development",
+      "destination": "/services/ai-integration",
+      "permanent": true
+    },
+    {
+      "source": "/services/api-development",
+      "destination": "/services/business-automation",
+      "permanent": true
+    },
+    {
+      "source": "/services/cloud-computing",
+      "destination": "/services/cloud-devops",
+      "permanent": true
+    },
+    {
+      "source": "/services/devops",
+      "destination": "/services/cloud-devops",
+      "permanent": true
+    },
+    {
+      "source": "/services/erp-development",
+      "destination": "/services/crm-development",
+      "permanent": true
+    }
   ],
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/shots/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    },
+    {
       "source": "/api/(.*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
   ]
 }

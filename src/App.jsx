@@ -1,58 +1,55 @@
-import { Fragment, useEffect, useRef, useState } from "react";
-import * as THREE from "three";
+import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import "./App.css";
-import { ventures, products } from "./brands";
-import { TechnologiesPage, HomeHero, VenturesTeaser } from "./Showcase";
+import { products } from "./brands";
+import { TechnologiesPage, HomeHero } from "./Showcase";
 import { VenturesPage } from "./VenturesPage";
 import { TechTeaser, ClosingCTA } from "./HomeSections";
 import { ReachUsPage } from "./ReachUs";
 import { validateEnquiry, GENERAL_ENQUIRY, PUBLIC_EMAIL, whatsappLink, WHATSAPP_DISPLAY } from "./lib/enquiry";
 import { WhatsAppFloat, WhatsAppIcon } from "./WhatsApp";
+import { keyFromPath, metaFor, SITE } from "./site/routes.js";
+import { Link } from "./site/nav.jsx";
+import { NavContext } from "./site/nav-context.js";
+import { attribution, captureAttribution, installClickTracking, track } from "./lib/track";
+import { SERVICES } from "./content/services.js";
+import { ServicesIndex, ServicePage } from "./pages/Services.jsx";
+import { BrokrSuitePage } from "./pages/BrokrSuite.jsx";
+import { WorkPage } from "./pages/Work.jsx";
+import { IndustriesPage } from "./pages/Industries.jsx";
+import { InsightsIndex, ArticlePage } from "./pages/Insights.jsx";
+import { AboutPage } from "./pages/About.jsx";
+import { PrivacyPage, TermsPage, NotFoundPage } from "./pages/Legal.jsx";
+import { ServicesOverview, BrokrHome, HomeProcess, IndustriesStrip, WhyUs, HomeFaq } from "./pages/HomeExtras.jsx";
 
 const logoImg = "/quenchmark-logo.png";
 
-/* each page has a real URL so refreshes, direct links and back/forward work.
-   Old URLs (e.g. /careers) are mapped to their replacement. */
-const ROUTES = {
-  home: {
-    path: "/",
-    title: "Quenchmark",
-    description: "Quenchmark is a venture group building focused digital businesses across technology, finance, cybersecurity, travel, SaaS and automation.",
-  },
-  ventures: {
-    path: "/ventures",
-    title: "Ventures | Quenchmark",
-    description: "Explore the Quenchmark ventures — focused digital businesses across cybersecurity, travel, finance and automation.",
-  },
-  technologies: {
-    path: "/technologies",
-    title: "Technologies | Quenchmark",
-    description: "The Quenchmark product arm — SaaS platforms and AI-powered tools built and operated in-house.",
-  },
-  contact: {
-    path: "/contact",
-    title: "Contact | Quenchmark",
-    description: "Get in touch with Quenchmark. Email official@quenchmark.org — we respond within 24 hours.",
-  },
-  "reach-us": {
-    path: "/reach-us",
-    title: "Reach Us – Website, App, AI & Software Development | Quenchmark",
-    description: "Tell us about your project. QuenchMark builds websites, mobile apps, custom software, AI automation, UI/UX design and digital marketing for growing businesses.",
-  },
-};
-const LEGACY_PATHS = { "/careers": "reach-us" };
-
-function pageFromPath(pathname) {
-  const path = pathname.replace(/\/+$/, "") || "/";
-  if (LEGACY_PATHS[path]) return LEGACY_PATHS[path];
-  const hit = Object.entries(ROUTES).find(([, r]) => r.path === path);
-  return hit ? hit[0] : "home";
-}
-
-function setMeta(selector, attr, value) {
-  const el = document.head.querySelector(selector);
-  if (el) el.setAttribute(attr, value);
+/* keep <head> in step with the current page (the prerendered HTML already has
+   the right tags; this keeps them correct as visitors navigate in-app) */
+function applyHead(meta) {
+  document.title = meta.title;
+  const set = (selector, attr, value, create) => {
+    let el = document.head.querySelector(selector);
+    if (!el && create) { el = create(); document.head.appendChild(el); }
+    if (el) el.setAttribute(attr, value);
+  };
+  set('meta[name="description"]', "content", meta.description);
+  set('link[rel="canonical"]', "href", meta.canonical);
+  set('meta[property="og:url"]', "content", meta.canonical);
+  set('meta[property="og:title"]', "content", meta.title);
+  set('meta[property="og:description"]', "content", meta.description);
+  set('meta[property="og:type"]', "content", meta.ogType || "website");
+  set('meta[name="twitter:title"]', "content", meta.title);
+  set('meta[name="twitter:description"]', "content", meta.description);
+  set('meta[name="robots"]', "content", meta.noindex ? "noindex, follow" : "index, follow");
+  document.head.querySelectorAll("script[data-ld]").forEach((n) => n.remove());
+  for (const obj of meta.ld || []) {
+    const sc = document.createElement("script");
+    sc.type = "application/ld+json";
+    sc.dataset.ld = "";
+    sc.textContent = JSON.stringify(obj);
+    document.head.appendChild(sc);
+  }
 }
 
 /* reveal-on-scroll wrapper */
@@ -128,6 +125,10 @@ const THEME_GLOW = {
 function HeroThree() {
   const ref = useRef(null);
   useEffect(() => {
+    // three.js is fetched on demand, so it never weighs down the other pages
+    let dead = false;
+    let cleanup = () => {};
+    function setup(THREE) {
     const canvas = ref.current;
     if (!canvas) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -259,6 +260,9 @@ function HeroThree() {
       mat.dispose();
       renderer.dispose();
     };
+    }
+    import("./three-lite.js").then((THREE) => { if (!dead) cleanup = setup(THREE) || cleanup; });
+    return () => { dead = true; cleanup(); };
   }, []);
   return <canvas ref={ref} className="hero-three" aria-hidden="true" />;
 }
@@ -267,6 +271,10 @@ function HeroThree() {
 function StatementThree() {
   const ref = useRef(null);
   useEffect(() => {
+    // three.js is fetched on demand, so it never weighs down the other pages
+    let dead = false;
+    let cleanup = () => {};
+    function setup(THREE) {
     const canvas = ref.current;
     if (!canvas) return;
     const host = canvas.parentElement;
@@ -370,51 +378,26 @@ function StatementThree() {
       });
       renderer.dispose();
     };
+    }
+    import("./three-lite.js").then((THREE) => { if (!dead) cleanup = setup(THREE) || cleanup; });
+    return () => { dead = true; cleanup(); };
   }, []);
   return <canvas ref={ref} className="stmt-three" aria-hidden="true" />;
 }
 
-/* types out text part-by-part with a blinking caret */
-function Typewriter({ parts, speed = 42, startDelay = 350, onDone }) {
-  const total = parts.reduce((s, p) => s + p.text.length, 0);
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    let i = 0, timer;
-    const startId = setTimeout(function tick() {
-      i += 1;
-      setCount(i);
-      if (i < total) timer = setTimeout(tick, speed);
-      else if (onDone) timer = setTimeout(onDone, 450);
-    }, startDelay);
-    return () => { clearTimeout(startId); clearTimeout(timer); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  let remaining = count;
-  return (
-    <>
-      {parts.map((p, idx) => {
-        const show = Math.max(0, Math.min(p.text.length, remaining));
-        remaining -= p.text.length;
-        const slice = p.text.slice(0, show);
-        if (!slice) return null;
-        return p.className
-          ? <span key={idx} className={p.className}>{slice}</span>
-          : <span key={idx}>{slice}</span>;
-      })}
-      {count < total && <span className="tw-caret" aria-hidden="true" />}
-    </>
-  );
-}
-
 /* ---------- NAVBAR ---------- */
-function Navbar({ nav, page }) {
+const NAV_LINKS = [
+  ["Services", "/services", (p) => p === "services" || p.startsWith("service:")],
+  ["BrokrSuite", "/brokrsuite", (p) => p === "brokrsuite"],
+  ["Work", "/work", (p) => p === "work" || p === "technologies" || p === "ventures"],
+  ["Industries", "/industries", (p) => p === "industries"],
+  ["Insights", "/insights", (p) => p === "insights" || p.startsWith("insight:")],
+  ["About", "/about", (p) => p === "about"],
+];
+
+function Navbar({ page }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState("creme");
-  // [label, target, kind] — "section" scrolls the home page, "page" opens a full page
-  const links = [
-    ["Home", "home", "section"], ["About", "about", "section"], ["Ventures", "ventures", "page"],
-    ["Technologies", "technologies", "page"], ["Approach", "approach", "section"],
-  ];
   const close = () => setMenuOpen(false);
 
   // match the navbar colour to whichever section sits under it
@@ -444,31 +427,25 @@ function Navbar({ nav, page }) {
 
   return (
     <header className="nav-wrap">
-      <nav className={`nav nav-theme-${theme}`}>
-        <button type="button" className="brand brand-button" onClick={() => { nav.section("home"); close(); }} aria-label="Quenchmark home">
+      <nav className={`nav nav-theme-${theme}`} aria-label="Main">
+        <Link to="/" className="brand brand-button" onClick={close} aria-label="QuenchMark Technologies home">
           <span className="brand-logo-wrap">
-            <img src={logoImg} alt="Quenchmark" className="brand-logo" />
+            <img src={logoImg} alt="QuenchMark" className="brand-logo" width="160" height="48" />
           </span>
-        </button>
+        </Link>
 
         <ul className={`nav-links ${menuOpen ? "open" : ""}`} id="primary-nav">
-          {links.map(([label, id, kind]) => (
-            <li key={id}>
-              <button
-                type="button"
-                className={kind === "page" && page === id ? "is-current" : ""}
-                onClick={() => { if (kind === "page") nav.open(id); else nav.section(id); close(); }}
-              >
-                {label}
-              </button>
+          {NAV_LINKS.map(([label, to, isCurrent]) => (
+            <li key={to}>
+              <Link to={to} className={isCurrent(page) ? "is-current" : ""} aria-current={isCurrent(page) ? "page" : undefined} onClick={close}>{label}</Link>
             </li>
           ))}
-          <li><button type="button" onClick={() => { nav.contact(); close(); }}>Contact</button></li>
-          <li className="nav-mobile-only"><button type="button" className={page === "reach-us" ? "is-current" : ""} onClick={() => { nav.reachUs(); close(); }}>Reach Us</button></li>
+          <li className="nav-mobile-only"><Link to="/contact" onClick={close}>Contact</Link></li>
+          <li className="nav-mobile-only"><Link to="/reach-us#enquiry" className={page === "reach-us" ? "is-current" : ""} onClick={close} data-cta="nav-mobile-quote">Get a Free Quote</Link></li>
         </ul>
 
         <div className="nav-right">
-          <button className="btn btn-solid nav-cta" aria-current={page === "reach-us" ? "page" : undefined} onClick={() => nav.reachUs()}>Reach Us</button>
+          <Link to="/reach-us#enquiry" className="btn btn-solid nav-cta" aria-current={page === "reach-us" ? "page" : undefined} data-cta="nav-quote">Get a Free Quote</Link>
         </div>
 
         <button className={`burger ${menuOpen ? "open" : ""}`} aria-label="Menu" aria-expanded={menuOpen} aria-controls="primary-nav" onClick={() => setMenuOpen((v) => !v)}>
@@ -480,230 +457,73 @@ function Navbar({ nav, page }) {
 }
 
 /* ---------- FOOTER ---------- */
-function Footer({ nav }) {
+function Footer() {
   return (
     <footer className="footer" data-nav="creme">
       <div className="footer-top">
         <div className="footer-brand">
-          <div className="brand">
+          <Link to="/" className="brand" aria-label="QuenchMark Technologies home">
             <span className="brand-logo-wrap">
-              <img src={logoImg} alt="Quenchmark" className="brand-logo" />
+              <img src={logoImg} alt="QuenchMark" className="brand-logo" width="160" height="48" loading="lazy" />
             </span>
-          </div>
-          <p>Building and scaling digital-first ventures across cybersecurity, AI, finance, travel, SaaS and automation.</p>
+          </Link>
+          <p>{SITE.name} — {SITE.tagline.charAt(0).toLowerCase() + SITE.tagline.slice(1)}</p>
           <div className="footer-contact">
-            <a href="mailto:official@quenchmark.org">official@quenchmark.org</a>
+            <a href={`mailto:${PUBLIC_EMAIL}`}>{PUBLIC_EMAIL}</a>
             <a className="wa-inline" href={whatsappLink()} target="_blank" rel="noopener noreferrer"><WhatsAppIcon /> WhatsApp {WHATSAPP_DISPLAY}</a>
-            <span>India-based, global vision</span>
+            <span>Based in India · Working worldwide</span>
           </div>
         </div>
         <div className="footer-col">
-          <h4>Ventures</h4>
-          {ventures.map((v) => (
-            <button type="button" key={v.key} onClick={() => nav.open("ventures", v.chapter)}>{v.title}</button>
-          ))}
+          <h4>Services</h4>
+          {SERVICES.slice(0, 7).map((s) => <Link key={s.slug} to={`/services/${s.slug}`}>{s.name}</Link>)}
+          <Link to="/services">All services →</Link>
         </div>
         <div className="footer-col">
-          <h4>Technologies</h4>
-          {products.map((p) => (
-            <button type="button" key={p.key} onClick={() => nav.open("technologies", p.chapter)}>{p.title}</button>
-          ))}
-        </div>
-        <div className="footer-col">
-          <h4>What we do</h4>
-          <button type="button" onClick={() => nav.open("ventures", "v-parameterx")}>Cybersecurity</button>
-          <button type="button" onClick={() => nav.open("ventures", "v-tripsoul")}>Travel</button>
-          <button type="button" onClick={() => nav.open("technologies")}>SaaS products</button>
-          <button type="button" onClick={() => nav.section("approach")}>Our approach</button>
+          <h4>BrokrSuite</h4>
+          <Link to="/brokrsuite">Real estate CRM</Link>
+          <Link to="/brokrsuite#demo" data-cta="footer-brokr-demo">Book a demo</Link>
+          <a href="https://apps.apple.com/in/app/brokrsuite/id6807412019" target="_blank" rel="noopener noreferrer">App Store</a>
+          <a href="https://play.google.com/store/apps/details?id=com.brokrsuite.app" target="_blank" rel="noopener noreferrer">Google Play</a>
+          <a href="https://www.brokrsuite.in" target="_blank" rel="noopener">brokrsuite.in</a>
         </div>
         <div className="footer-col">
           <h4>Company</h4>
-          <button type="button" onClick={() => nav.section("about")}>About</button>
-          <button type="button" onClick={() => nav.contact()}>Contact</button>
-          <button type="button" onClick={() => nav.reachUs()}>Reach Us</button>
-          <a href="mailto:official@quenchmark.org">Email Us</a>
+          <Link to="/about">About</Link>
+          <Link to="/work">Our work</Link>
+          {products.filter((p) => p.key !== "brokr").map((p) => <Link key={p.key} to="/technologies">{p.title}</Link>)}
+          <Link to="/ventures">Ventures</Link>
+          <Link to="/industries">Industries</Link>
+          <Link to="/insights">Insights</Link>
+        </div>
+        <div className="footer-col">
+          <h4>Get in touch</h4>
+          <Link to="/reach-us#enquiry" data-cta="footer-quote">Request a free quote</Link>
+          <Link to="/contact">Contact</Link>
+          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">WhatsApp us</a>
+          <a href={`mailto:${PUBLIC_EMAIL}`}>Email us</a>
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© 2026 Quenchmark. All rights reserved.</span>
-        <span>Building digital futures.</span>
+        <span>© {2026} {SITE.name}. All rights reserved.</span>
+        <span className="footer-legal"><Link to="/privacy-policy">Privacy Policy</Link> · <Link to="/terms">Terms of Use</Link></span>
       </div>
     </footer>
-  );
-}
-
-const flow = [
-  { title: "Discover", desc: "We identify untapped market opportunities through deep research and analysis." },
-  { title: "Design", desc: "Architect scalable solutions with user-centric design and cutting-edge tech." },
-  { title: "Build", desc: "Develop and iterate rapidly with agile methodologies and quality-first approach." },
-  { title: "Scale", desc: "Deploy, monitor, and optimize for growth with data-driven strategies." },
-];
-
-const values = [
-  { title: "Build to last", desc: "We engineer ventures for durability — real businesses, not vanity metrics." },
-  { title: "Ship with conviction", desc: "A bias to action. We move fast, decide clearly, and back ourselves." },
-  { title: "Honest by default", desc: "Transparency with partners, candor with our teams, trust with users." },
-  { title: "People over hype", desc: "Great teams build great companies — so we invest in people first." },
-];
-
-/* a titled numbered list that drops down / folds up via a toggle */
-function NumColumn({ kicker, title, items, variant }) {
-  const [open, setOpen] = useState(false);
-  const colRef = useRef(null);
-  // auto-fold when the column scrolls out of view (only after it has been seen,
-  // so a column opened from the nav isn't closed before you arrive)
-  useEffect(() => {
-    const el = colRef.current;
-    if (!el) return;
-    let seen = false;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) seen = true;
-        else if (seen) setOpen(false);
-      },
-      { threshold: 0 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  // the nav's "Approach" link opens every column
-  useEffect(() => {
-    const openAll = () => setOpen(true);
-    window.addEventListener("qm:open-approach", openAll);
-    return () => window.removeEventListener("qm:open-approach", openAll);
-  }, []);
-  return (
-    <Reveal className="m2-col" variant={variant}>
-      <span className="kicker">{kicker}</span>
-      <h2 className="m2-title">{title}</h2>
-      <button
-        className={`flow-toggle ${open ? "is-open" : ""}`}
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-      >
-        <span>{open ? "Close flow" : "Open the flow"}</span>
-        <span className="flow-count">{items.length}</span>
-        <svg className="m2-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-      </button>
-      <div className={`num-collapse ${open ? "" : "is-closed"}`} ref={colRef}>
-        <div className={`num-list ${open ? "is-open" : "is-closed"}`}>
-          {items.map((it, i) => (
-            <div className="num-item" key={it.title} style={{ "--i": i }}>
-              <span className="num3d">{String(i + 1).padStart(2, "0")}</span>
-              <div className="num-text">
-                <h4>{it.title}</h4>
-                <p>{it.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Reveal>
-  );
-}
-
-/* ---------- ABOUT: a staged entrance — heading words rise, the highlight sweeps,
-   sector tags pop in, then the three principles are drawn in sequence ---------- */
-const ABOUT_SECTORS = ["Cybersecurity", "AI products", "Financial research", "Travel tech", "SaaS platforms", "Automation"];
-const ABOUT_PRINCIPLES = ["Create focused companies", "Operate with discipline", "Scale through systems"];
-function AboutSection() {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setInView(true), { threshold: 0.3 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  const lead = "A multi-venture company building practical".split(" ");
-  const mark = "digital businesses.".split(" ");
-  return (
-    <section ref={ref} className={`hs hs-cream about-anim ${inView ? "is-in" : ""}`} id="about" data-nav="sand">
-      <span className="about-orb" aria-hidden="true" />
-      <div className="about-premium">
-        <div className="about-premium-copy">
-          <span className="kicker">03 — About Quenchmark</span>
-          <h2 aria-label="A multi-venture company building practical digital businesses.">
-            {lead.map((w, i) => (
-              <Fragment key={i}><span className="aw" aria-hidden="true"><span style={{ "--i": i }}>{w}</span></span>{" "}</Fragment>
-            ))}
-            <span className="about-mark" aria-hidden="true">
-              {mark.map((w, i) => (
-                <Fragment key={w}><span className="aw"><span style={{ "--i": lead.length + i }}>{w}</span></span>{i < mark.length - 1 ? " " : ""}</Fragment>
-              ))}
-            </span>
-          </h2>
-          <p>
-            Quenchmark is a multi-venture company focused on creating, operating and scaling high-value digital businesses. We work across cybersecurity, AI-powered products, financial research, travel technology, SaaS platforms and automation-driven solutions.
-          </p>
-          {/* sectors scroll continuously left → right; the list is doubled for a seamless loop */}
-          <div className="about-marquee" aria-label="Sectors we work in">
-            <ul className="about-marquee-track">
-              {[0, 1].map((copy) =>
-                ABOUT_SECTORS.map((t) => (
-                  <li key={`${copy}-${t}`} aria-hidden={copy === 1}>{t}</li>
-                ))
-              )}
-            </ul>
-          </div>
-        </div>
-        <ol className="about-principles">
-          <span className="about-thread" aria-hidden="true" />
-          {ABOUT_PRINCIPLES.map((title, i) => (
-            <li className="principle" key={title} style={{ "--i": i }}>
-              <span className="principle-num" aria-hidden="true">
-                <span>{String(i + 1).padStart(2, "0")}</span>
-                <span>{String(i + 1).padStart(2, "0")}</span>
-              </span>
-              <span className="principle-text">
-                <strong>{title}</strong>
-              </span>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
   );
 }
 
 /* ---------- HOME ---------- */
 function Home({ nav }) {
   return (
-    <>
+    <main>
       <HeroThree />
-      {/* 00 — hero */}
       <HomeHero nav={nav} />
-
-      {/* 01 — ventures: photo showcase; the full story lives on its own page */}
-      <VenturesTeaser onOpen={(chapter) => nav.open("ventures", chapter)} />
-
-      {/* 02 — technologies: the product arm, with real product screens */}
+      <ServicesOverview />
+      <BrokrHome />
       <TechTeaser onOpen={(chapter) => nav.open("technologies", chapter)} />
-
-      {/* 03 — about + how we work */}
-      <AboutSection />
-
-      {/* MISSION & HOW WE WORK */}
-      <section className="band band-mist zoom-sec" id="approach" data-nav="pink">
-        <div className="m2-grid">
-          <NumColumn
-            kicker="Our Mission"
-            title="One vision — ventures that outlast the trend."
-            items={values}
-            variant="left"
-          />
-          <NumColumn
-            kicker="How We Work"
-            title="From spark to scale, a disciplined path."
-            items={flow}
-            variant="right"
-          />
-        </div>
-      </section>
+      <HomeProcess />
+      <IndustriesStrip />
+      <WhyUs />
 
       {/* statement */}
       <section
@@ -721,9 +541,7 @@ function Home({ nav }) {
         <span className="statement-spot" aria-hidden="true" />
         <StatementThree />
         <Reveal>
-          <h2 className="statement statement-shimmer">
-            Travel smarter. Scale efficiently. Trade intelligently.
-          </h2>
+          <p className="statement statement-shimmer">Design it. Build it. Scale it.</p>
         </Reveal>
       </section>
 
@@ -734,21 +552,22 @@ function Home({ nav }) {
             <span className="kicker">Leadership</span>
             <h2>Built with a founder-led vision</h2>
             <p>
-              Prince Saini is the Founder of Quenchmark, building technology-driven ventures across AI, SaaS, travel, and digital products. He focuses on creating scalable businesses that solve real-world problems through innovation and thoughtful execution.
+              Prince Saini is the Founder of QuenchMark, building technology-driven products and businesses across AI, SaaS, travel and digital services. He focuses on creating scalable solutions that solve real-world problems through innovation and thoughtful execution.
             </p>
+            <p><Link className="pg-link" to="/about">More about QuenchMark →</Link></p>
           </Reveal>
           <Reveal className="founder-card" delay={120}>
             <span className="founder-initials">PS</span>
             <h3>Prince Saini</h3>
-            <strong>Founder, Quenchmark</strong>
-            <p>Entrepreneur | Venture Builder | Product Founder</p>
+            <strong>Founder, QuenchMark</strong>
+            <p>Entrepreneur | Product Builder | Founder</p>
           </Reveal>
         </div>
       </section>
 
-      {/* closing call to action */}
+      <HomeFaq />
       <ClosingCTA nav={nav} />
-    </>
+    </main>
   );
 }
 
@@ -787,6 +606,8 @@ function ContactPage({ nav }) {
       service: GENERAL_ENQUIRY,
       contactMethod: "Email",
       website: f.get("website"),
+      formType: "development",
+      attribution: attribution(),
       elapsedMs: Date.now() - startedAt.current,
     };
     const { errors } = validateEnquiry(payload);
@@ -805,6 +626,7 @@ function ContactPage({ nav }) {
       form.reset();
       setStatus("idle");
       setShowThanks(true);
+      track("generate_lead", { lead_type: "development", service: GENERAL_ENQUIRY, form_location: "/contact" });
     } catch (err) {
       setMessage(err.message && !/fetch/i.test(err.message) ? err.message : `We couldn't reach our server. Please try again or email us at ${PUBLIC_EMAIL}.`);
       setStatus("error");
@@ -817,9 +639,9 @@ function ContactPage({ nav }) {
       <div className="screen-inner contact-split">
         <Reveal className="contact-intro">
           <span className="kicker">Contact Us</span>
-          <h2>Let's build something <span className="hl">together.</span></h2>
+          <h1>Let&apos;s build something <span className="hl">together.</span></h1>
           <p>
-            Ready to scale your venture with Quenchmark? Connect with Us Today.
+            Questions, ideas or a project in mind? Send us a message and we&apos;ll reply within 24 hours.
           </p>
           <ul className="contact-points">
             <li><span>Email</span><a href={`mailto:${PUBLIC_EMAIL}`}>{PUBLIC_EMAIL}</a></li>
@@ -883,15 +705,45 @@ function ContactPage({ nav }) {
   );
 }
 
-/* ---------- APP (lightweight page switcher) ---------- */
-function App() {
-  const [page, setPage] = useState(() => pageFromPath(window.location.pathname));
-  const [pendingSection, setPendingSection] = useState(null);
-  const [intro, setIntro] = useState("typing"); // typing -> moving -> done
+/* ---------- which component renders for a page key ---------- */
+function PageView({ page, nav }) {
+  if (page.startsWith("service:")) return <ServicePage key={page} slug={page.slice(8)} />;
+  if (page.startsWith("insight:")) return <ArticlePage key={page} slug={page.slice(8)} />;
+  switch (page) {
+    case "home": return <Home nav={nav} />;
+    case "services": return <ServicesIndex />;
+    case "brokrsuite": return <BrokrSuitePage />;
+    case "work": return <WorkPage />;
+    case "industries": return <IndustriesPage />;
+    case "insights": return <InsightsIndex />;
+    case "about": return <AboutPage />;
+    case "ventures": return <VenturesPage nav={nav} />;
+    case "technologies": return <TechnologiesPage nav={nav} />;
+    case "contact": return <ContactPage nav={nav} />;
+    case "reach-us": return <ReachUsPage nav={nav} />;
+    case "privacy-policy": return <PrivacyPage />;
+    case "terms": return <TermsPage />;
+    default: return <NotFoundPage />;
+  }
+}
+
+/* pages with their own scroll choreography (pinned / centred chapters) */
+const LEGACY_SCROLL = new Set(["home", "ventures", "technologies"]);
+
+/* ---------- APP (lightweight page switcher) ----------
+   `initialPath` is passed by the build-time prerenderer; in the browser the
+   current URL is used. */
+function App({ initialPath }) {
+  const [page, setPage] = useState(() => keyFromPath(initialPath ?? window.location.pathname));
+  const [pendingSection, setPendingSection] = useState(() =>
+    typeof window !== "undefined" && initialPath === undefined && window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : null
+  );
   const lenisRef = useRef(null);
 
-  // buttery momentum scrolling
+  // buttery momentum scrolling + analytics bootstrapping
   useEffect(() => {
+    captureAttribution();
+    installClickTracking();
     const lenis = new Lenis({
       lerp: 0.13,           // follows the wheel closely: smooth, without the trailing "lag" feel
       smoothWheel: true,
@@ -921,16 +773,15 @@ function App() {
     }
     const el = document.getElementById(id);
     if (!el) return;
-    if (id === "enquiry") {
-      // Reach Us: put the form itself just under the floating navbar
-      // (wide screens: the heading + form row; stacked/mobile: the form card)
+    if (id === "enquiry" || !LEGACY_SCROLL.has(page)) {
+      // land the target just under the floating navbar (Reach Us: the form itself)
       const land = (instant) => {
-        const target = window.innerWidth <= 1000
-          ? el.querySelector(".ru-form-card") || el
-          : el.querySelector(".ru-inner") || el;
-        const nav = document.querySelector(".nav-wrap");
-        const navH = (nav ? nav.offsetHeight : 96) + 16; // the navbar is sticky at top: 0
-        // offsetTop ignores the card's entrance transform, so we land where it settles
+        const target = id === "enquiry"
+          ? (window.innerWidth <= 1000 ? el.querySelector(".ru-form-card") : el.querySelector(".ru-inner")) || el
+          : el;
+        const navEl = document.querySelector(".nav-wrap");
+        const navH = (navEl ? navEl.offsetHeight : 96) + 16; // the navbar is sticky at top: 0
+        // offsetTop ignores entrance transforms, so we land where things settle
         let top = 0;
         for (let n = target; n; n = n.offsetParent) top += n.offsetTop;
         const y = Math.max(0, top - navH);
@@ -942,19 +793,6 @@ function App() {
         // arriving from another page, the layout can still shift for a moment:
         // re-measure once it settles and correct the jump
         if (immediate) setTimeout(() => land(true), 300);
-      });
-      return;
-    }
-    if (id === "approach") {
-      // open both "flow" dropdowns, and land the section's top under the navbar
-      window.dispatchEvent(new Event("qm:open-approach"));
-      // land just under the floating navbar; measured after the open state renders
-      requestAnimationFrame(() => {
-        const nav = document.querySelector(".nav-wrap");
-        const navH = nav ? nav.offsetHeight + 12 : 112;
-        const y = el.getBoundingClientRect().top + window.scrollY - navH;
-        if (lenis) lenis.scrollTo(y, immediate ? { immediate: true } : { duration: 1.2 });
-        else window.scrollTo({ top: y, behavior: "smooth" });
       });
       return;
     }
@@ -986,33 +824,37 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  // keep the URL, title and description in step with the page
+  // keep the URL and <head> in step with the page
   useEffect(() => {
-    const route = ROUTES[page] || ROUTES.home;
-    if (window.location.pathname !== route.path) {
-      const legacy = LEGACY_PATHS[window.location.pathname.replace(/\/+$/, "")];
-      // an old URL (e.g. /careers) is replaced, not stacked in history
-      window.history[legacy ? "replaceState" : "pushState"]({ page }, "", route.path + window.location.hash);
+    const meta = metaFor(page);
+    if (page !== "notfound") {
+      const current = window.location.pathname;
+      if (current.replace(/\/+$/, "") !== meta.path.replace(/\/+$/, "") || (current !== "/" && current.endsWith("/"))) {
+        // an old/alias URL for this same page is replaced; a new page is pushed
+        const same = keyFromPath(current) === page;
+        window.history[same ? "replaceState" : "pushState"]({ page }, "", meta.path + window.location.search + window.location.hash);
+      }
     }
-    document.title = route.title;
-    const url = `https://quenchmark.org${route.path === "/" ? "/" : route.path}`;
-    setMeta('meta[name="description"]', "content", route.description);
-    setMeta('link[rel="canonical"]', "href", url);
-    setMeta('meta[property="og:url"]', "content", url);
-    setMeta('meta[property="og:title"]', "content", route.title);
-    setMeta('meta[property="og:description"]', "content", route.description);
-    setMeta('meta[name="twitter:title"]', "content", route.title);
-    setMeta('meta[name="twitter:description"]', "content", route.description);
+    applyHead(meta);
+    track("page_view_spa", { page_path: meta.path, page_type: page.split(":")[0] });
   }, [page]);
 
   // browser back / forward
   useEffect(() => {
-    const onPop = () => setPage(pageFromPath(window.location.pathname));
+    const onPop = () => setPage(keyFromPath(window.location.pathname));
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   const nav = {
+    /* go to any path, e.g. "/services/web-development" or "/reach-us#enquiry" or "#quote" */
+    go: (to) => {
+      const [path, hash] = to.split("#");
+      if (!path) { if (hash) scrollToSection(hash); return; }
+      const key = keyFromPath(path);
+      if (key === page) scrollToSection(hash || "home");
+      else { setPendingSection(hash || null); setPage(key); }
+    },
     section: (id) => {
       if (page === "home") {
         scrollToSection(id);
@@ -1021,7 +863,7 @@ function App() {
         setPage("home");
       }
     },
-    /* open a full page (ventures / technologies), optionally at a chapter */
+    /* open a full page by key (ventures / technologies …), optionally at a chapter */
     open: (target, anchor) => {
       if (target === page) {
         if (anchor) scrollToSection(anchor);
@@ -1036,41 +878,24 @@ function App() {
       if (lenisRef.current) lenisRef.current.scrollTo(y, { duration: 1.1 });
       else window.scrollTo({ top: y, behavior: "smooth" });
     },
-    contact: () => setPage("contact"),
-    /* every "Reach Us" button lands on the enquiry form */
-    reachUs: () => nav.open("reach-us", "enquiry"),
+    contact: () => nav.go("/contact"),
+    /* every "Reach Us" / "Get a quote" button lands on the enquiry form */
+    reachUs: () => nav.go("/reach-us#enquiry"),
   };
-  const fullPage = page === "home" || page === "ventures" || page === "technologies" || page === "reach-us";
+  const fullPage = page !== "contact";
 
   return (
-    <>
-      {intro !== "done" && (
-        <div className={`intro ${intro === "moving" ? "intro-exit" : ""}`}>
-          <h1 className="intro-title">
-            <Typewriter
-              parts={[
-                { text: "Powerful businesses, built " },
-                { text: "under one vision.", className: "hl" },
-              ]}
-              onDone={() => {
-                setIntro("moving");
-                setTimeout(() => setIntro("done"), 1000);
-              }}
-            />
-          </h1>
+    <NavContext.Provider value={nav}>
+      <a className="skip-link" href="#main-content">Skip to content</a>
+      <div className={`page ${fullPage ? "" : "page-locked"} revealed`}>
+        <Navbar page={page} />
+        <div id="main-content" tabIndex={-1}>
+          <PageView page={page} nav={nav} />
         </div>
-      )}
-      <div className={`page ${fullPage ? "" : "page-locked"} ${intro === "typing" ? "page-hidden" : "revealed"}`}>
-        <Navbar nav={nav} page={page} />
-        {page === "home" && <Home nav={nav} />}
-        {page === "ventures" && <VenturesPage nav={nav} />}
-        {page === "technologies" && <TechnologiesPage nav={nav} />}
-        {page === "contact" && <ContactPage nav={nav} />}
-        {page === "reach-us" && <ReachUsPage nav={nav} />}
-        {fullPage ? <Footer nav={nav} /> : <MiniFooter />}
+        {fullPage ? <Footer /> : <MiniFooter />}
         <WhatsAppFloat />
       </div>
-    </>
+    </NavContext.Provider>
   );
 }
 

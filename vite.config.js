@@ -25,17 +25,17 @@ function devApi(env) {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, isSsrBuild }) => ({
   plugins: [react(), devApi(loadEnv(mode, process.cwd(), ''))],
   base: "/",
   build: {
     chunkSizeWarningLimit: 900,
-    rollupOptions: {
+    // the SSR build (used only for prerendering) keeps its dependencies external
+    rollupOptions: isSsrBuild ? {} : {
       output: {
         manualChunks: {
           react: ["react", "react-dom"],
           motion: ["lenis"],
-          three: ["three"],
         },
       },
     },

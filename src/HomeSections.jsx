@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { products } from "./brands";
 import "./home.css";
+import { whatsappLink } from "./lib/enquiry";
+import { WhatsAppIcon } from "./WhatsApp";
 
 /* Home page sections below the hero. They share one system: full-width
    sections with alternating backgrounds, a 1240px content column, and the same
@@ -93,10 +95,10 @@ export function TechTeaser({ onOpen }) {
       <div className="hs-inner">
         <SectionHead
           dark
-          no="02"
-          kicker="Quenchmark Technologies"
+          no="03"
+          kicker="Selected work"
           title={<>Software we <em>build</em> and run.</>}
-          text="Three products, made in-house, for real estate teams, Instagram creators and traders."
+          text="Three products designed, built and operated by our team — for real estate businesses, Instagram creators and traders. The same team builds for our clients."
           action={
             <button type="button" className="hs-btn hs-btn-light" onClick={() => onOpen()}>
               Explore Technologies <Arrow d={RIGHT} />
@@ -187,9 +189,10 @@ export function ClosingCTA({ nav }) {
           <h2>Let&apos;s build something <em>that lasts.</em></h2>
         </div>
         <div className="cx-side">
+          <p className="cx-text">Free consultation, a written scope and a transparent estimate — before any work begins.</p>
           <div className="cx-actions">
-            <button type="button" className="hs-btn hs-btn-light" onClick={nav.contact}>Partner with us <Arrow d={RIGHT} /></button>
-            <button type="button" className="hs-btn hs-btn-ghost-light" onClick={nav.reachUs}>Start a project</button>
+            <button type="button" className="hs-btn hs-btn-light" onClick={nav.reachUs} data-cta="Request a Free Quote">Request a Free Quote <Arrow d={RIGHT} /></button>
+            <a className="hs-btn hs-btn-wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer" data-track="home-closing"><WhatsAppIcon /> Chat on WhatsApp</a>
           </div>
           <a className="cx-mail" href="mailto:official@quenchmark.org">official@quenchmark.org</a>
         </div>
