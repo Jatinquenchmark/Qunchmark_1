@@ -405,37 +405,6 @@ function Typewriter({ parts, speed = 42, startDelay = 350, onDone }) {
   );
 }
 
-/* light / dark switch — the choice is saved and applied before paint (see index.html) */
-function ThemeToggle() {
-  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || "light");
-  const flip = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    const root = document.documentElement;
-    root.classList.add("theme-anim");
-    root.dataset.theme = next;
-    window.setTimeout(() => root.classList.remove("theme-anim"), 450);
-    try { localStorage.setItem("qm-theme", next); } catch { /* storage blocked: theme still applies for this visit */ }
-    setTheme(next);
-  };
-  const dark = theme === "dark";
-  return (
-    <button
-      type="button"
-      className="theme-toggle"
-      onClick={flip}
-      aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
-      title={dark ? "Light theme" : "Dark theme"}
-    >
-      <span className={`tt-icon ${dark ? "" : "is-on"}`} aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
-      </span>
-      <span className={`tt-icon ${dark ? "is-on" : ""}`} aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
-      </span>
-    </button>
-  );
-}
-
 /* ---------- NAVBAR ---------- */
 function Navbar({ nav, page }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -498,7 +467,6 @@ function Navbar({ nav, page }) {
         </ul>
 
         <div className="nav-right">
-          <ThemeToggle />
           <button className="btn btn-solid nav-cta" aria-current={page === "reach-us" ? "page" : undefined} onClick={() => nav.reachUs()}>Reach Us</button>
         </div>
 

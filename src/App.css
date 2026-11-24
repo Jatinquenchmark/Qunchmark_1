@@ -2368,7 +2368,6 @@ section[id] {
 .contact-link { background: none; padding: 0; font: inherit; font-weight: 600; color: var(--accent-rose); }
 .contact-link:hover { text-decoration: underline; }
 .contact-error { font-size: 0.86rem; color: #dc2626; margin: 0; }
-:root[data-theme="dark"] .contact-error { color: #f87171; }
 .form-submit:disabled { opacity: 0.75; cursor: progress; transform: none; }
 
 /* thank-you popup */
